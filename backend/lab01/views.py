@@ -8,11 +8,11 @@ def get_services(request):
         input_text = ""
     print(input_text)
     services = [
-        {'id': 1, 'title': 'Docker', 'logo_file_name': 'logo-docker.png', 'price': 100},
-        {'id': 2, 'title': 'NodeJS', 'logo_file_name': 'logo-node-js.png', 'price': 150},
-        {'id': 3, 'title': 'Python', 'logo_file_name': 'logo-python.png', 'price': 200},
-        {'id': 4, 'title': 'JS', 'logo_file_name': 'logo-javascript.png', 'price': 300},
-        {'id': 5, 'title': 'git', 'logo_file_name': 'logo-git.png', 'price': 400},
+        {'id': 1, 'title': 'Docker', 'logo_file_name': 'http://172.19.0.3:9000/server-soft-logos/logo-docker.png', 'price': 100},
+        {'id': 2, 'title': 'NodeJS', 'logo_file_name': 'http://172.19.0.3:9000/server-soft-logos/logo-node-js.png', 'price': 150},
+        {'id': 3, 'title': 'Python', 'logo_file_name': 'http://172.19.0.3:9000/server-soft-logos/logo-python.png', 'price': 200},
+        {'id': 4, 'title': 'JS', 'logo_file_name': 'http://172.19.0.3:9000/server-soft-logos/logo-javascript.png', 'price': 300},
+        {'id': 5, 'title': 'git', 'logo_file_name': 'http://172.19.0.3:9000/server-soft-logos/logo-git.png', 'price': 400},
     ]
 
     return render(request, 'services.html',
@@ -23,11 +23,11 @@ def get_services(request):
 
 def get_service(request, id):
     services = {
-        1: {'title': 'Docker', 'logo_file_name': 'logo-docker.png', 'price': 100, 'size': '500Mb'},
-        2: {'title': 'NodeJS', 'logo_file_name': 'logo-node-js.png', 'price': 150, 'size': '100Mb'},
-        3: {'title': 'Python', 'logo_file_name': 'logo-python.png', 'price': 200, 'size': '1Gb'},
-        4: {'title': 'JS', 'logo_file_name': 'logo-javascript.png', 'price': 300, 'size': '800Mb'},
-        5: {'title': 'git', 'logo_file_name': 'logo-git.png', 'price': 400, 'size': '30Mb'},
+        1: {'title': 'Docker', 'logo_file_name': 'http://172.19.0.3:9000/server-soft-logos/logo-docker.png', 'price': 100, 'size': '500Mb'},
+        2: {'title': 'NodeJS', 'logo_file_name': 'http://172.19.0.3:9000/server-soft-logos/logo-node-js.png', 'price': 150, 'size': '100Mb'},
+        3: {'title': 'Python', 'logo_file_name': 'http://172.19.0.3:9000/server-soft-logos/logo-python.png', 'price': 200, 'size': '1Gb'},
+        4: {'title': 'JS', 'logo_file_name': 'http://172.19.0.3:9000/server-soft-logos/logo-javascript.png', 'price': 300, 'size': '800Mb'},
+        5: {'title': 'git', 'logo_file_name': 'http://172.19.0.3:9000/server-soft-logos/logo-git.png', 'price': 400, 'size': '30Mb'},
     }
 
     return render(request, 'service.html',
@@ -41,8 +41,8 @@ def get_order(request, id):
     return render(request, 'order.html',
                   {'data': {
                       'services': [
-                          {'id': 1, 'title': 'Docker', 'logo_file_name': 'logo-docker.png', 'price': 100},
-                          {'id': 2, 'title': 'NodeJS', 'logo_file_name': 'logo-node-js.png', 'price': 150},
-                          {'id': 3, 'title': 'Python', 'logo_file_name': 'logo-python.png', 'price': 200},
+                          {'id': 1, 'title': 'Docker', 'logo_file_name': 'http://172.19.0.3:9000/server-soft-logos/logo-docker.png', 'price': 100},
+                          {'id': 2, 'title': 'NodeJS', 'logo_file_name': 'http://172.19.0.3:9000/server-soft-logos/logo-node-js.png', 'price': 150},
+                          {'id': 3, 'title': 'Python', 'logo_file_name': 'http://172.19.0.3:9000/server-soft-logos/logo-python.png', 'price': 200},
                       ]
                   }})

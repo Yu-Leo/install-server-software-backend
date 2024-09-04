@@ -8,7 +8,7 @@
     {% for service in data.services %}
         <li>
             <a href="{% url 'service_url' service.id %}">{{ service.title }}</a>
-            <img src="http://172.19.0.3:9000/server-soft-logos/{{ service.logo_file_name }}" alt="{{ service.logo_file_name }}" width="100px">
+            <img src="{{ service.logo_file_name }}" alt="{{ service.logo_file_name }}" width="100px">
             Цена: {{ service.price }}
         </li>
     {% empty %}

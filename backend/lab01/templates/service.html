@@ -5,7 +5,7 @@
 {% block content %}
 
     <h1>Информация о ПО {{ data.title }} </h1>
-    <img src="http://172.19.0.3:9000/server-soft-logos/{{ data.logo_file_name }}" alt="{{ data.logo_file_name }}"
+    <img src="{{ data.logo_file_name }}" alt="{{ data.logo_file_name }}"
          width="100px">
     <br>
     Цена установки: {{ data.price }} руб.
