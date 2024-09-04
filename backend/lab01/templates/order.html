@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block title %}Заказ{% endblock %}
+
+{% block content %}
+
+<ul>
+    {% for service in data.services %}
+        <li>
+            <a href="{% url 'service_url' service.id %}">{{ service.title }}</a>
+            <img src="http://172.19.0.3:9000/server-soft-logos/{{ service.logo_file_name }}" alt="{{ service.logo_file_name }}" width="100px">
+            Цена: {{ service.price }}
+        </li>
+    {% empty %}
+        <li>Список пуст</li>
+    {% endfor %}
+</ul>
+    <br>
+    <br>
+
+<a href="{% url 'services' %}">Список услуг</a>
+
+{% endblock %}

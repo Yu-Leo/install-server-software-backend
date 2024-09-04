@@ -17,6 +17,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
+from lab01 import views
+
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', views.get_services, name='services'),
+    path('service/<int:id>/', views.get_service, name='service_url'),
+    path('order/', views.get_order, name='order'),
+    path('send_text', views.send_text, name='send_text'),
 ]

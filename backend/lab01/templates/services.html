@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}Список ПО для установки{% endblock %}
+
+{% block content %}
+    <form action="send_text" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input name="text" type="text"><br><br>
+        <input type="submit" value="Submit">
+    </form>
+
+    <ul>
+        {% for service in data.services %}
+            <li>
+                <img src="http://172.19.0.3:9000/server-soft-logos/{{ service.logo_file_name }}"
+                     alt="{{ service.logo_file_name }}" width="100px">
+
+                <a href="{% url 'service_url' service.id %}">{{ service.title }}</a>
+                Цена: {{ service.price }} руб.
+            </li>
+        {% empty %}
+            <li>Список пуст</li>
+        {% endfor %}
+    </ul>
+    <br>
+    <br>
+
+    <a href="{% url 'order' %}">Заказ</a>
+{% endblock %}
