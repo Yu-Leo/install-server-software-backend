@@ -3,7 +3,7 @@
 {% block title %}Список ПО для установки{% endblock %}
 
 {% block content %}
-    <form action="send_text" method="post" enctype="multipart/form-data">
+    <form action="" method="post" enctype="multipart/form-data">
         {% csrf_token %}
         <input name="text" type="text"><br><br>
         <input type="submit" value="Submit">
@@ -25,5 +25,5 @@
     <br>
     <br>
 
-    <a href="{% url 'order' %}">Заказ</a>
+    <a href="{% url 'order' 0 %}">Корзина (3)</a>
 {% endblock %}
