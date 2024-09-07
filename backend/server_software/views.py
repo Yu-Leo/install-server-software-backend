@@ -2,15 +2,20 @@ from django.shortcuts import render
 
 services = [
     {'id': 0, 'title': 'Docker', 'logo_file_name': 'http://172.19.0.3:9000/server-soft-logos/0.png',
-     'price': 100},
+     'price': 100,
+     'summary': 'Программное обеспечение для автоматизации развёртывания и управления приложениями.'},
     {'id': 1, 'title': 'NodeJS', 'logo_file_name': 'http://172.19.0.3:9000/server-soft-logos/1.png',
-     'price': 150},
+     'price': 150,
+     'summary': 'Программная платформа, основанная на движке V8, которая превращает JavaScript из узкоспециализированного языка в язык общего назначения.'},
     {'id': 2, 'title': 'Python', 'logo_file_name': 'http://172.19.0.3:9000/server-soft-logos/2.png',
-     'price': 200},
+     'price': 200,
+     'summary': 'Мультипарадигмальный высокоуровневый язык программирования общего назначения с динамической строгой типизацией'},
     {'id': 3, 'title': 'JS', 'logo_file_name': 'http://172.19.0.3:9000/server-soft-logos/3.png',
-     'price': 300},
+     'price': 300,
+     'summary': 'Язык программирования, который в первую очередь применяют в веб-сфере'},
     {'id': 4, 'title': 'git', 'logo_file_name': 'http://172.19.0.3:9000/server-soft-logos/4.png',
-     'price': 400},
+     'price': 400,
+     'summary': 'Распределённая система управления версиями.'},
 ]
 
 order = [

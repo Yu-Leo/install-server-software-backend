@@ -3,30 +3,35 @@
 {% block title %}Список ПО для установки{% endblock %}
 
 {% block content %}
-    <br>
-    <br>
-    <form action="" method="get">
-        <input name="q" type="text">
-        <br>
-        <br>
-        <input type="submit" value="Поиск">
+    <form action="" method="get" class="d-flex mt-4 mb-4">
+        <input class="form-control me-1" placeholder="Поиск" aria-label="Поиск" name="q" type="text">
+        <input type="submit" class="btn dark-blue-btn ml-3 mr-3" value="Поиск">
+        <a href="{% url 'order' 0 %}" class="btn dark-blue-btn">Корзина ({{ data.count }})</a>
     </form>
-
-    <ul>
+    <div class="row row-cols-1 row-cols-md-2
+                    row-cols-lg-4 g-4">
         {% for service in data.services %}
-            <li>
-                <img src="{{ service.logo_file_name }}"
-                     alt="{{ service.logo_file_name }}" width="100px">
-
-                <a href="{% url 'service_url' service.id %}">{{ service.title }}</a>
-                Цена: {{ service.price }} руб.
-            </li>
+            <div class="col">
+                <div class="card h-100">
+                    <img src="{{ service.logo_file_name }}" class="card-img-top service-card-img"
+                         alt="{{ service.logo_file_name }}"
+                    >
+                    <div class="card-body">
+                        <h5 class="card-title">{{ service.title }}</h5>
+                        <p class="card-text">{{ service.summary }}</p>
+                    </div>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">Цена: <strong>{{ service.price }} руб.</strong></li>
+                    </ul>
+                    <div class="card-body">
+                        <a href="{% url 'service_url' service.id %}" class="btn dark-blue-btn">Узнать подробнее</a>
+                    </div>
+                </div>
+            </div>
         {% empty %}
-            <li>Список пуст</li>
+            <div class="alert alert-danger not-found-alert" role="alert">
+                ПО по запросу не найдено. <a href="{% url 'services' %}" class="alert-link">Полный список</a>
+            </div>
         {% endfor %}
-    </ul>
-    <br>
-    <br>
-
-    <a href="{% url 'order' 0 %}">Корзина ({{ data.count }})</a>
+    </div>
 {% endblock %}

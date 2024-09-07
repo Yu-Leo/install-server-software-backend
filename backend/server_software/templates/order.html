@@ -3,23 +3,39 @@
 {% block title %}Заказ{% endblock %}
 
 {% block content %}
-<br>
-    <br>
     Сервер пользователя: <strong>123.43.23.53</strong>
-<ul>
     {% for service in data.services %}
-        <li>
-            <a href="{% url 'service_url' service.id %}">{{ service.title }}</a>
-            <img src="{{ service.logo_file_name }}" alt="{{ service.logo_file_name }}" width="100px">
-            Цена: {{ service.price }}
-        </li>
+        <div class="card mb-3">
+            <div class="row g-0">
+                <div class="col-md-2">
+                    <div class="card-body">
+                        <img src="{{ service.logo_file_name }}" width="100px" class="img-fluid rounded-start"
+                             alt="{{ service.logo_file_name }}">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <a class="text-black text-decoration-none"
+                               href="{% url 'service_url' service.id %}">{{ service.title }}</a>
+                        </h5>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="card-body">
+                        <p class="card-text">Версия: <strong>v3.0</strong></p>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="card-body">
+                        <p class="card-text">Цена: <strong>{{ service.price }} руб.</strong></p>
+                    </div>
+                </div>
+            </div>
+        </div>
     {% empty %}
-        <li>Список пуст</li>
+        <div class="alert alert-danger not-found-alert" role="alert">
+            Корзина пуста
+        </div>
     {% endfor %}
-</ul>
-    <br>
-    <br>
-
-<a href="{% url 'services' %}">Список услуг</a>
-
 {% endblock %}
