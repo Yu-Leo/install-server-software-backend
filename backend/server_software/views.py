@@ -9,7 +9,8 @@ services = [
      'price': 200},
     {'id': 3, 'title': 'JS', 'logo_file_name': 'http://172.19.0.3:9000/server-soft-logos/3.png',
      'price': 300},
-    {'id': 4, 'title': 'git', 'logo_file_name': 'http://172.19.0.3:9000/server-soft-logos/4.png', 'price': 400},
+    {'id': 4, 'title': 'git', 'logo_file_name': 'http://172.19.0.3:9000/server-soft-logos/4.png',
+     'price': 400},
 ]
 
 order = [
@@ -22,29 +23,26 @@ order = [
 ]
 
 
-def get_services(request):
-    if request.method == "POST":
-        input_text = request.POST['text']
-    else:
-        input_text = ""
-    print(input_text)
+def get_software_list_page(request):
+    search_query = request.GET.get('q', '')
 
     return render(request, 'services.html',
                   {'data': {
-                      'services': [i for i in services if i["title"].startswith(input_text)],
+                      'services': [i for i in services if i["title"].startswith(search_query)],
                       'count': len(order)
-                  },})
+                  }, })
 
 
-def get_service(request, id):
+def get_software_page(request, id):
     for i in services:
         if i['id'] == id:
             return render(request, 'service.html',
                           {'data': i})
+
     render(request, 'service.html')
 
 
-def get_order(request, id):
+def get_order_page(request, id):
     if id != 0:
         return render(request, 'order.html')
 
