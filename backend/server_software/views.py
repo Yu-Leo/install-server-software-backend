@@ -1,23 +1,23 @@
 from django.shortcuts import render
 
 services = [
-    {'id': 1, 'title': 'Docker', 'logo_file_name': 'http://172.19.0.3:9000/server-soft-logos/logo-docker.png',
+    {'id': 0, 'title': 'Docker', 'logo_file_name': 'http://172.19.0.3:9000/server-soft-logos/0.png',
      'price': 100},
-    {'id': 2, 'title': 'NodeJS', 'logo_file_name': 'http://172.19.0.3:9000/server-soft-logos/logo-node-js.png',
+    {'id': 1, 'title': 'NodeJS', 'logo_file_name': 'http://172.19.0.3:9000/server-soft-logos/1.png',
      'price': 150},
-    {'id': 3, 'title': 'Python', 'logo_file_name': 'http://172.19.0.3:9000/server-soft-logos/logo-python.png',
+    {'id': 2, 'title': 'Python', 'logo_file_name': 'http://172.19.0.3:9000/server-soft-logos/2.png',
      'price': 200},
-    {'id': 4, 'title': 'JS', 'logo_file_name': 'http://172.19.0.3:9000/server-soft-logos/logo-javascript.png',
+    {'id': 3, 'title': 'JS', 'logo_file_name': 'http://172.19.0.3:9000/server-soft-logos/3.png',
      'price': 300},
-    {'id': 5, 'title': 'git', 'logo_file_name': 'http://172.19.0.3:9000/server-soft-logos/logo-git.png', 'price': 400},
+    {'id': 4, 'title': 'git', 'logo_file_name': 'http://172.19.0.3:9000/server-soft-logos/4.png', 'price': 400},
 ]
 
 order = [
-    {'id': 1, 'title': 'Docker', 'logo_file_name': 'http://172.19.0.3:9000/server-soft-logos/logo-docker.png',
+    {'id': 0, 'title': 'Docker', 'logo_file_name': 'http://172.19.0.3:9000/server-soft-logos/0.png',
      'price': 100},
-    {'id': 2, 'title': 'NodeJS', 'logo_file_name': 'http://172.19.0.3:9000/server-soft-logos/logo-node-js.png',
+    {'id': 1, 'title': 'NodeJS', 'logo_file_name': 'http://172.19.0.3:9000/server-soft-logos/1.png',
      'price': 150},
-    {'id': 3, 'title': 'Python', 'logo_file_name': 'http://172.19.0.3:9000/server-soft-logos/logo-python.png',
+    {'id': 2, 'title': 'Python', 'logo_file_name': 'http://172.19.0.3:9000/server-soft-logos/2.png',
      'price': 200},
 ]
 
