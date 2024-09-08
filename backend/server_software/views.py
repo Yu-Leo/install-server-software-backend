@@ -67,7 +67,7 @@ order = [
     },
 ]
 
-MINIO_HOST = '172.19.0.3'
+MINIO_HOST = '127.0.0.1'
 MINIO_PORT = 9000
 MINIO_DIR = 'server-soft-logos'
 
