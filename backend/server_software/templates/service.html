@@ -3,14 +3,26 @@
 {% block title %}{{ data.title }}{% endblock %}
 
 {% block content %}
-
-    <h1>Информация о ПО {{ data.title }} </h1>
-    <img src="{{ data.logo_file_name }}" alt="{{ data.logo_file_name }}"
-         width="100px">
-    <br>
-    Цена установки: {{ data.price }} руб.
-    <br>
-    Размер: {{ data.size }}
-    <br>
-    <br>
+    <div class="mt-4">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a class="dark-blue-color" href="{% url 'services' %}">Каталог</a></li>
+                <li class="breadcrumb-item active" aria-current="page">{{ data.title }}</li>
+            </ol>
+        </nav>
+    </div>
+    <div class="row">
+        <div class="col">
+            <h2>{{ data.title }}</h2>
+            <p class=""><strong>Цена установки:</strong> {{ data.price }} руб.</p>
+            <p class=""><strong>Время установки:</strong> {{ data.time }} мин.</p>
+            <p class=""><strong>Размер:</strong> {{ data.size }}</p>
+            <p class="py-2"><strong>Описание</strong></p>
+        </div>
+        <div class="col">
+            <img src="{{ data.logo_file_name }}" alt="{{ data.logo_file_name }}"
+                 width="200px">
+        </div>
+    </div>
+    <p>{{ data.description }}</p>
 {% endblock %}

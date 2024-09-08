@@ -3,7 +3,13 @@
 {% block title %}Заказ{% endblock %}
 
 {% block content %}
-    Сервер пользователя: <strong>123.43.23.53</strong>
+    <div class="card mb-3 mt-4">
+        <div class="card-body">
+            <h5 class="card-title">
+                Сервер пользователя: <strong>123.43.23.53</strong>
+            </h5>
+        </div>
+    </div>
     {% for service in data.services %}
         <div class="card mb-3">
             <div class="row g-0">
@@ -28,7 +34,7 @@
                 </div>
                 <div class="col-md-2">
                     <div class="card-body">
-                        <p class="card-text">Цена: <strong>{{ service.price }} руб.</strong></p>
+                        <p class="card-text"><strong>{{ service.price }} руб.</strong></p>
                     </div>
                 </div>
             </div>
@@ -38,4 +44,20 @@
             Корзина пуста
         </div>
     {% endfor %}
+    <div class="card mb-3 mt-4">
+        <div class="row g-0">
+            <div class="col-md-10">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        ИТОГО:
+                    </h5>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="card-body">
+                    <strong>{{ data.total }} руб.</strong>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}

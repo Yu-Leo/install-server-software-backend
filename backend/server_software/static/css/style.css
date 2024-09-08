@@ -2,6 +2,10 @@
     background-color: #1F364A;
 }
 
+.dark-blue-color {
+    color: #1F364A;
+}
+
 .service-card-img {
     width: 70%;
     margin-left: auto;
@@ -22,4 +26,15 @@
 
 .not-found-alert {
     width: 100%;
+}
+
+.dark-blue-border {
+    border-color: #1F364A;
+    color: #1F364A;
+}
+
+.dark-blue-border:hover {
+    border-color: #1F364A;
+    background-color: #1F364A;
+    color: #ffffff;
 }
