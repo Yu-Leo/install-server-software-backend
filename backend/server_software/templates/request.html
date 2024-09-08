@@ -3,61 +3,77 @@
 {% block title %}Заказ{% endblock %}
 
 {% block content %}
-    <div class="card mb-3 mt-4">
-        <div class="card-body">
-            <h5 class="card-title">
-                Сервер пользователя: <strong>123.43.23.53</strong>
-            </h5>
-        </div>
-    </div>
-    {% for software in data.software_list %}
-        <div class="card mb-3">
-            <div class="row g-0">
-                <div class="col-md-2">
-                    <div class="card-body">
-                        <img src="{{ software.logo_file_path }}" width="100px" class="img-fluid rounded-start"
-                             alt="{{ software.logo_file_path }}">
+    <form method="post">
+        {% csrf_token %}
+        <div class="card mb-3 mt-4">
+            <div class="card-body">
+                <div class="col-md-4">
+                    <div class="input-group input-group-default mb-3">
+                        <span class="input-group-text" id="inputGroup-sizing-sm">Сервер пользователя:</span>
+                        <input type="text" class="form-control" aria-label="Sizing example input"
+                               aria-describedby="inputGroup-sizing-default" name="user_host" value="{{ data.user_host }}">
                     </div>
                 </div>
-                <div class="col-md-6">
+            </div>
+        </div>
+        {% for obj in data.software_list %}
+            <div class="card mb-3">
+                <div class="row g-0">
+                    <div class="col-md-2">
+                        <div class="card-body">
+                            <img src="{{ obj.software.logo_file_path }}" width="100px"
+                                 class="img-fluid rounded-start"
+                                 alt="{{ obj.software.logo_file_path }}">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <a class="text-black text-decoration-none"
+                                   href="{% url 'software_url' obj.software.id %}">{{ obj.software.title }}</a>
+                            </h5>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="card-body">
+                            <div class="input-group input-group-sm mb-3">
+                                <span class="input-group-text" id="inputGroup-sizing-sm">Версия</span>
+                                <input type="text" class="form-control" aria-label="Sizing example input"
+                                       aria-describedby="inputGroup-sizing-sm" name="{{ data.req_id }}-{{ obj.software_id }}" value="{{ obj.version }}">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="card-body">
+                            <p class="card-text"><strong>{{ obj.software.price }} руб.</strong></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="alert alert-danger not-found-alert" role="alert">
+                Корзина пуста
+            </div>
+        {% endfor %}
+        <div class="card mb-3 mt-4">
+            <div class="row g-0">
+                <div class="col-md-10">
                     <div class="card-body">
                         <h5 class="card-title">
-                            <a class="text-black text-decoration-none"
-                               href="{% url 'software_url' software.id %}">{{ software.title }}</a>
+                            ИТОГО:
                         </h5>
                     </div>
                 </div>
                 <div class="col-md-2">
                     <div class="card-body">
-                        <p class="card-text">Версия: <strong>v3.0</strong></p>
-                    </div>
-                </div>
-                <div class="col-md-2">
-                    <div class="card-body">
-                        <p class="card-text"><strong>{{ software.price }} руб.</strong></p>
+                        <strong>{{ data.total }} руб.</strong>
                     </div>
                 </div>
             </div>
         </div>
-    {% empty %}
-        <div class="alert alert-danger not-found-alert" role="alert">
-            Корзина пуста
+        <div class="d-flex justify-content-between">
+            <button class="btn btn-danger" name="request_action" value="delete_request">Удалить заявку</button>
+            <button class="btn btn-success" name="request_action" value="form_request">Оформить заявку</button>
         </div>
-    {% endfor %}
-    <div class="card mb-3 mt-4">
-        <div class="row g-0">
-            <div class="col-md-10">
-                <div class="card-body">
-                    <h5 class="card-title">
-                        ИТОГО:
-                    </h5>
-                </div>
-            </div>
-            <div class="col-md-2">
-                <div class="card-body">
-                    <strong>{{ data.total }} руб.</strong>
-                </div>
-            </div>
-        </div>
-    </div>
+    </form>
 {% endblock %}

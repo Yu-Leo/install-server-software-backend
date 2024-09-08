@@ -1,135 +1,121 @@
-from django.shortcuts import render
+from datetime import datetime
 
-software_list = [
-    {
-        'id': 0,
-        'title': 'Docker',
-        'logo_file_name': '0.png',
-        'price': 100,
-        'time': 10,
-        'size': '300 Мб',
-        'summary': 'Программное обеспечение для автоматизации развёртывания и управления приложениями.',
-        'description': 'Docker — программное обеспечение для автоматизации развёртывания и управления приложениями в средах с поддержкой контейнеризации, контейнеризатор приложений. Позволяет «упаковать» приложение со всем своим окружением[англ.] и зависимостями в контейнер, который может быть развёрнут на любой Linux-системе с поддержкой контрольных групп в ядре, а также предоставляет набор команд для управления этими контейнерами. Изначально использовал возможности LXC, с 2015 года начал использовать собственную библиотеку, абстрагирующую виртуализационные возможности ядра Linux — libcontainer. С появлением Open Container Initiative начался переход от монолитной к модульной архитектуре.',
-    },
+from django.shortcuts import render, redirect
+from django.db import connection
 
-    {
-        'id': 1,
-        'title': 'NodeJS',
-        'logo_file_name': '1.png',
-        'price': 150,
-        'time': 10,
-        'size': '300 Мб',
-        'summary': 'Программная платформа, основанная на движке V8, которая превращает JavaScript из узкоспециализированного языка в язык общего назначения.',
-        'description': 'Node.js применяется преимущественно на сервере, выполняя роль веб-сервера. Однако есть возможность разрабатывать на Node.js и десктопные оконные приложения, а также программировать микроконтроллеры.',
-    },
-    {
-        'id': 2,
-        'title': 'Python',
-        'logo_file_name': '2.png',
-        'price': 200,
-        'time': 20,
-        'size': '100 Мб',
-        'summary': 'Мультипарадигмальный высокоуровневый язык программирования общего назначения с динамической строгой типизацией',
-        'description': 'Мультипарадигмальный высокоуровневый язык программирования общего назначения с динамической строгой типизацией и автоматическим управлением памятью, ориентированный на повышение производительности разработчика, читаемости кода и его качества. Мультипарадигмальный высокоуровневый язык программирования общего назначения с динамической строгой типизацией и автоматическим управлением памятью, ориентированный на повышение производительности разработчика, читаемости кода и его качества, а также на обеспечение переносимости написанных на нём программ. Язык является полностью объектно-ориентированным в том плане, что всё является объектами. Необычной особенностью языка является выделение блоков кода отступами. Синтаксис ядра языка минималистичен, за счёт чего на практике редко возникает необходимость обращаться к документации. Сам же язык известен как интерпретируемый и используется в том числе для написания скриптов',
-    },
-    {
-        'id': 3,
-        'title': 'JS',
-        'logo_file_name': '3.png',
-        'price': 300,
-        'time': 43,
-        'size': '300 Мб',
-        'summary': 'Язык программирования, который в первую очередь применяют в веб-сфере',
-        'description': 'Язык программирования, который в первую очередь применяют в веб-сфере. С его помощью сайты делают интерактивными: добавляют всплывающие окна, анимацию, кнопки лайков и формы для отправки информации.',
-    },
-    {
-        'id': 4,
-        'title': 'git',
-        'logo_file_name': '4.png',
-        'price': 400,
-        'time': 13,
-        'size': '100 Мб',
-        'summary': 'Распределённая система управления версиями.',
-        'description': 'Распределённая система управления версиями. Проект был создан Линусом Торвальдсом для управления разработкой ядра Linux, первая версия выпущена 7 апреля 2005 года; координатор - Дзюн Хамано. Среди проектов, использующих Git, - ядро Linux, Swift, Android, Drupal, Cairo, GNU Core Utilities, Mesa, Wine, Chromium, Compiz Fusion, FlightGear, jQuery, PHP, NASM, MediaWiki, DokuWiki, Q',
-    },
-]
+from server_software.models import Software, Request, SoftwareInRequest
 
-user_request = [
-    {
-        'id': 0,
-        'title': 'Docker',
-        'logo_file_name': '0.png',
-        'price': 100,
-    },
-    {
-        'id': 1,
-        'title': 'NodeJS',
-        'logo_file_name': '1.png',
-        'price': 150,
-    },
-    {
-        'id': 2,
-        'title': 'Python',
-        'logo_file_name': '2.png',
-        'price': 200,
-    },
-]
-
-MINIO_HOST = '127.0.0.1'
-MINIO_PORT = 9000
-MINIO_DIR = 'server-soft-logos'
+USER_ID = 1
 
 
-def get_image_file_path(file_name: str) -> str:
-    return f'http://{MINIO_HOST}:{MINIO_PORT}/{MINIO_DIR}/{file_name}'
-
-
-def get_software_list(search_query: str):
-    res = []
-    for software in software_list:
-        if software["title"].lower().startswith(search_query.lower()):
-            res.append(software)
-            res[-1]['logo_file_path'] = get_image_file_path(software["logo_file_name"])
-    return res
-
-
-def get_request_data():
-    res = user_request.copy()
-    for i in range(len(res)):
-        res[i]['logo_file_path'] = get_image_file_path(res[i]["logo_file_name"])
-
-    s = sum([i['price'] for i in res])
+def get_request_data(request_id: int):
+    req = Request.objects.filter(id=request_id).first()
+    items = SoftwareInRequest.objects.filter(request_id=request_id).select_related('software')
+    s = sum([i.software.price for i in items])
     return {
-        'software_list': res,
+        'software_list': items,
         'total': s,
+        'req_id': request_id,
+        'user_host': req.host,
     }
 
 
-def software_list_page(request):
-    software_title = request.GET.get('software_title', '')
+def get_items_in_request(request_id: int) -> int:
+    """
+    Получение колическа элементов в заявке по её id
+    """
+    return SoftwareInRequest.objects.filter(request_id=request_id).select_related('software').count()
 
+
+def get_or_create_user_cart(user_id: int) -> int:
+    """
+    Если у пользователя есть заявка в статусе DRAFT (корзина), возвращает её Id.
+    Если нет - создает и возвращает id созданной заявки
+    """
+    old_req = Request.objects.filter(client_id=USER_ID, status=Request.RequestStatus.DRAFT).first()
+    if old_req is not None:
+        return old_req.id
+
+    new_req = Request(client_id=USER_ID, status=Request.RequestStatus.DRAFT)
+    new_req.save()
+    return new_req.id
+
+
+def add_item_to_request(request_id: int, software_id: int):
+    """
+    Добавление услуги в заявку
+    """
+    sir = SoftwareInRequest(request_id=request_id, software_id=software_id)
+    sir.save()
+
+
+def software_list_page(request):
+    if request.method == "POST":
+        data = request.POST
+        software_id = data.get("add_to_cart")
+        if software_id is not None:
+            request_id = get_or_create_user_cart(USER_ID)
+            add_item_to_request(request_id, software_id)
+
+    software_title = request.GET.get('software_title', '')
+    req = Request.objects.filter(client_id=USER_ID, status=Request.RequestStatus.DRAFT).first()
+    software_list = Software.objects.filter(title__istartswith=software_title, is_active=True)
     return render(request, 'software_list.html',
-                  {'data': {
-                      'software_list': get_software_list(software_title),
-                      'count': len(user_request),
-                      'software_title': software_title,
-                      'request_id': 0,
-                  }, })
+                  {'data':
+                      {
+                          'software_list': software_list,
+                          'items_in_cart': (get_items_in_request(req.id) if req is not None else 0),
+                          'software_title': software_title,
+                          'request_id': (req.id if req is not None else 0),
+                      },
+                  })
 
 
 def software_page(request, id):
-    for software in software_list:
-        if software['id'] == id:
-            software['logo_file_path'] = get_image_file_path(software["logo_file_name"])
-            return render(request, 'software.html',
-                          {'data': software})
+    data = Software.objects.filter(id=id).first()
+    if data is None:
+        return render(request, 'software.html')
 
-    render(request, 'software.html')
+    return render(request, 'software.html',
+                  {'data': {
+                      'software': data,
+                  }})
 
 
-def request_page(request, id):
-    if id != 0:
-        return render(request, 'request.html')
+def delete_request(request_id: int):
+    """
+    Удаление заявки по id
+    """
+    raw_sql = "UPDATE requests SET status='DELETED' WHERE id=%s "
+    with connection.cursor() as cursor:
+        cursor.execute(raw_sql, (request_id,))
+
+
+def form_request(request_id: int, data):
+    """
+    Формирование заявки
+    """
+    user_host = data.get('user_host')
+    items = SoftwareInRequest.objects.filter(request_id=request_id)
+    for i in items:
+        SoftwareInRequest.objects.filter(request_id=request_id, software_id=i.software_id).update(
+            version=data.get(f'{request_id}-{i.software_id}'))
+    Request.objects.filter(id=request_id).update(
+        status=Request.RequestStatus.FORMED,
+        formation_datetime=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        host=user_host)
+
+
+def request_page(request, id: int):
+    if request.method == "POST":
+        data = request.POST
+        action = data.get("request_action")
+        if action == "delete_request":
+            delete_request(id)
+            return redirect('software_list')
+        elif action == "form_request":
+            form_request(id, data)
+            return redirect('software_list')
 
     return render(request, 'request.html',
-                  {'data': get_request_data()})
+                  {'data': get_request_data(id)})
