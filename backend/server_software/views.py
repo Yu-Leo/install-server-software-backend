@@ -83,7 +83,7 @@ MINIO_DIR = 'server-soft-logos'
 def get_software_list(search_query: str):
     res = []
     for service in services:
-        if service["title"].lower().startswith(search_query):
+        if service["title"].lower().startswith(search_query.lower()):
             res.append(service)
             res[-1]['logo_file_path'] = f'http://{MINIO_HOST}:{MINIO_PORT}/{MINIO_DIR}/{service["id"]}.png'
     return res
@@ -107,7 +107,8 @@ def software_list_page(request):
     return render(request, 'services.html',
                   {'data': {
                       'services': get_software_list(search_query),
-                      'count': len(order)
+                      'count': len(order),
+                      'search_query': search_query
                   }, })
 
 
