@@ -4,6 +4,7 @@ services = [
     {
         'id': 0,
         'title': 'Docker',
+        'logo_file_name': '0.png',
         'price': 100,
         'time': 10,
         'size': '300 Мб',
@@ -14,6 +15,7 @@ services = [
     {
         'id': 1,
         'title': 'NodeJS',
+        'logo_file_name': '1.png',
         'price': 150,
         'time': 10,
         'size': '300 Мб',
@@ -23,6 +25,7 @@ services = [
     {
         'id': 2,
         'title': 'Python',
+        'logo_file_name': '2.png',
         'price': 200,
         'time': 20,
         'size': '100 Мб',
@@ -32,6 +35,7 @@ services = [
     {
         'id': 3,
         'title': 'JS',
+        'logo_file_name': '3.png',
         'price': 300,
         'time': 43,
         'size': '300 Мб',
@@ -41,6 +45,7 @@ services = [
     {
         'id': 4,
         'title': 'git',
+        'logo_file_name': '4.png',
         'price': 400,
         'time': 13,
         'size': '100 Мб',
@@ -53,16 +58,19 @@ order = [
     {
         'id': 0,
         'title': 'Docker',
+        'logo_file_name': '0.png',
         'price': 100,
     },
     {
         'id': 1,
         'title': 'NodeJS',
+        'logo_file_name': '1.png',
         'price': 150,
     },
     {
         'id': 2,
         'title': 'Python',
+        'logo_file_name': '2.png',
         'price': 200,
     },
 ]
@@ -77,14 +85,14 @@ def get_software_list(search_query: str):
     for service in services:
         if service["title"].lower().startswith(search_query):
             res.append(service)
-            res[-1]['logo_file_name'] = f'http://{MINIO_HOST}:{MINIO_PORT}/{MINIO_DIR}/{service["id"]}.png'
+            res[-1]['logo_file_path'] = f'http://{MINIO_HOST}:{MINIO_PORT}/{MINIO_DIR}/{service["id"]}.png'
     return res
 
 
 def get_order_data():
     res = order.copy()
     for i in range(len(res)):
-        res[i]['logo_file_name'] = f'http://{MINIO_HOST}:{MINIO_PORT}/{MINIO_DIR}/{res[i]["id"]}.png'
+        res[i]['logo_file_path'] = f'http://{MINIO_HOST}:{MINIO_PORT}/{MINIO_DIR}/{res[i]["logo_file_name"]}'
 
     s = sum([i['price'] for i in res])
     return {
@@ -106,7 +114,7 @@ def software_list_page(request):
 def software_page(request, id):
     for service in services:
         if service['id'] == id:
-            service['logo_file_name'] = f'http://{MINIO_HOST}:{MINIO_PORT}/{MINIO_DIR}/{service["id"]}.png'
+            service['logo_file_path'] = f'http://{MINIO_HOST}:{MINIO_PORT}/{MINIO_DIR}/{service["logo_file_name"]}'
             return render(request, 'service.html',
                           {'data': service})
 
