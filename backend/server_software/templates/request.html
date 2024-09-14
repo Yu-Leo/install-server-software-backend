@@ -10,20 +10,20 @@
             </h5>
         </div>
     </div>
-    {% for service in data.services %}
+    {% for software in data.software_list %}
         <div class="card mb-3">
             <div class="row g-0">
                 <div class="col-md-2">
                     <div class="card-body">
-                        <img src="{{ service.logo_file_path }}" width="100px" class="img-fluid rounded-start"
-                             alt="{{ service.logo_file_path }}">
+                        <img src="{{ software.logo_file_path }}" width="100px" class="img-fluid rounded-start"
+                             alt="{{ software.logo_file_path }}">
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="card-body">
                         <h5 class="card-title">
                             <a class="text-black text-decoration-none"
-                               href="{% url 'service_url' service.id %}">{{ service.title }}</a>
+                               href="{% url 'software_url' software.id %}">{{ software.title }}</a>
                         </h5>
                     </div>
                 </div>
@@ -34,7 +34,7 @@
                 </div>
                 <div class="col-md-2">
                     <div class="card-body">
-                        <p class="card-text"><strong>{{ service.price }} руб.</strong></p>
+                        <p class="card-text"><strong>{{ software.price }} руб.</strong></p>
                     </div>
                 </div>
             </div>

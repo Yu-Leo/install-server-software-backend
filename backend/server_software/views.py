@@ -1,6 +1,6 @@
 from django.shortcuts import render
 
-services = [
+software_list = [
     {
         'id': 0,
         'title': 'Docker',
@@ -54,7 +54,7 @@ services = [
     },
 ]
 
-order = [
+user_request = [
     {
         'id': 0,
         'title': 'Docker',
@@ -80,51 +80,55 @@ MINIO_PORT = 9000
 MINIO_DIR = 'server-soft-logos'
 
 
+def get_image_file_path(file_name: str) -> str:
+    return f'http://{MINIO_HOST}:{MINIO_PORT}/{MINIO_DIR}/{file_name}'
+
+
 def get_software_list(search_query: str):
     res = []
-    for service in services:
-        if service["title"].lower().startswith(search_query.lower()):
-            res.append(service)
-            res[-1]['logo_file_path'] = f'http://{MINIO_HOST}:{MINIO_PORT}/{MINIO_DIR}/{service["id"]}.png'
+    for software in software_list:
+        if software["title"].lower().startswith(search_query.lower()):
+            res.append(software)
+            res[-1]['logo_file_path'] = get_image_file_path(software["logo_file_name"])
     return res
 
 
-def get_order_data():
-    res = order.copy()
+def get_request_data():
+    res = user_request.copy()
     for i in range(len(res)):
-        res[i]['logo_file_path'] = f'http://{MINIO_HOST}:{MINIO_PORT}/{MINIO_DIR}/{res[i]["logo_file_name"]}'
+        res[i]['logo_file_path'] = get_image_file_path(res[i]["logo_file_name"])
 
     s = sum([i['price'] for i in res])
     return {
-        'services': res,
+        'software_list': res,
         'total': s,
     }
 
 
 def software_list_page(request):
-    search_query = request.GET.get('q', '')
+    software_title = request.GET.get('software_title', '')
 
-    return render(request, 'services.html',
+    return render(request, 'software_list.html',
                   {'data': {
-                      'services': get_software_list(search_query),
-                      'count': len(order),
-                      'search_query': search_query
+                      'software_list': get_software_list(software_title),
+                      'count': len(user_request),
+                      'software_title': software_title
                   }, })
 
 
 def software_page(request, id):
-    for service in services:
-        if service['id'] == id:
-            service['logo_file_path'] = f'http://{MINIO_HOST}:{MINIO_PORT}/{MINIO_DIR}/{service["logo_file_name"]}'
-            return render(request, 'service.html',
-                          {'data': service})
+    for software in software_list:
+        if software['id'] == id:
+            software['logo_file_path'] = get_image_file_path(software["logo_file_name"])
+            return render(request, 'software.html',
+                          {'data': software})
 
-    render(request, 'service.html')
+    render(request, 'software.html')
 
 
-def order_page(request, id):
+def request_page(request, id):
     if id != 0:
-        return render(request, 'order.html')
+        return render(request, 'request.html')
 
-    return render(request, 'order.html',
-                  {'data': get_order_data()})
+    return render(request, 'request.html',
+                  {'data': get_request_data()})

@@ -6,13 +6,13 @@
 {% block content %}
     <form action="" method="get" class="d-flex mt-4 mb-4">
         <div class="flex-grow-1">
-            <input class="form-control" placeholder="Поиск" aria-label="Поиск" name="q" type="text" value="{{ data.search_query }}">
+            <input class="form-control" placeholder="Поиск" aria-label="Поиск" name="software_title" type="text" value="{{ data.software_title }}">
         </div>
         <div class="px-3">
             <input type="submit" class="btn dark-blue-btn ml-3 mr-3" value="Поиск">
         </div>
         <div class="">
-            <a href="{% url 'order' 0 %}" class="btn dark-blue-border">
+            <a href="{% url 'request' 0 %}" class="btn dark-blue-border">
                 {{ data.count }}
                 <img src="{% static 'img/cart.png' %}" width="25" alt="cart">
             </a>
@@ -21,27 +21,27 @@
 
     <div class="row row-cols-1 row-cols-md-2
                     row-cols-lg-4 g-4">
-        {% for service in data.services %}
+        {% for software in data.software_list %}
             <div class="col">
                 <div class="card h-100">
-                    <img src="{{ service.logo_file_path }}" class="card-img-top service-card-img"
-                         alt="{{ service.logo_file_path }}"
+                    <img src="{{ software.logo_file_path }}" class="card-img-top software-card-img"
+                         alt="{{ software.logo_file_path }}"
                     >
                     <div class="card-body">
-                        <h5 class="card-title">{{ service.title }}</h5>
-                        <p class="card-text">{{ service.summary }}</p>
+                        <h5 class="card-title">{{ software.title }}</h5>
+                        <p class="card-text">{{ software.summary }}</p>
                     </div>
                     <ul class="list-group list-group-flush">
-                        <li class="list-group-item">Цена: <strong>{{ service.price }} руб.</strong></li>
+                        <li class="list-group-item">Цена: <strong>{{ software.price }} руб.</strong></li>
                     </ul>
                     <div class="card-body">
-                        <a href="{% url 'service_url' service.id %}" class="btn dark-blue-btn">Узнать подробнее</a>
+                        <a href="{% url 'software_url' software.id %}" class="btn dark-blue-btn">Узнать подробнее</a>
                     </div>
                 </div>
             </div>
         {% empty %}
             <div class="alert alert-danger not-found-alert" role="alert">
-                ПО по запросу не найдено. <a href="{% url 'services' %}" class="alert-link">Полный список</a>
+                ПО по запросу не найдено. <a href="{% url 'software_list' %}" class="alert-link">Полный список</a>
             </div>
         {% endfor %}
     </div>

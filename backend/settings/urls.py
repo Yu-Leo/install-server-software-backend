@@ -21,7 +21,7 @@ from server_software import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.software_list_page, name='services'),
-    path('service/<int:id>/', views.software_page, name='service_url'),
-    path('order/<int:id>/', views.order_page, name='order'),
+    path('', views.software_list_page, name='software_list'),
+    path('software/<int:id>/', views.software_page, name='software_url'),
+    path('request/<int:id>/', views.request_page, name='request'),
 ]
