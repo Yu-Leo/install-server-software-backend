@@ -1,9 +1,9 @@
 .dark-blue {
-    background-color: #1F364A;
+    background-color: #202e3b;
 }
 
 .dark-blue-color {
-    color: #1F364A;
+    color: #202e3b;
 }
 
 .software-card-img {
@@ -14,14 +14,14 @@
 }
 
 .dark-blue-btn {
-    background-color: #1F364A;
+    background-color: #202e3b;
     color: #fff;
 }
 
 .dark-blue-btn:hover {
     background-color: #fff;
-    border-color: #1F364A;
-    color: #1F364A;
+    border-color: #202e3b;
+    color: #202e3b;
 }
 
 .not-found-alert {
@@ -29,12 +29,12 @@
 }
 
 .dark-blue-border {
-    border-color: #1F364A;
-    color: #1F364A;
+    border-color: #202e3b;
+    color: #202e3b;
 }
 
 .dark-blue-border:hover {
-    border-color: #1F364A;
-    background-color: #1F364A;
+    border-color: #202e3b;
+    background-color: #202e3b;
     color: #ffffff;
 }
