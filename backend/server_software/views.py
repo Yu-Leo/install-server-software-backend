@@ -112,7 +112,8 @@ def software_list_page(request):
                   {'data': {
                       'software_list': get_software_list(software_title),
                       'count': len(user_request),
-                      'software_title': software_title
+                      'software_title': software_title,
+                      'request_id': 0,
                   }, })
 
 

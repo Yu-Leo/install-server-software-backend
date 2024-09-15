@@ -12,7 +12,7 @@
             <input type="submit" class="btn dark-blue-btn ml-3 mr-3" value="Поиск">
         </div>
         <div class="">
-            <a href="{% url 'request' 0 %}" class="btn dark-blue-border">
+            <a href="{% url 'request' data.request_id %}" class="btn dark-blue-border">
                 {{ data.count }}
                 <img src="{% static 'img/cart.png' %}" width="25" alt="cart">
             </a>
