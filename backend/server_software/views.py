@@ -2,6 +2,7 @@ from datetime import datetime
 
 from django.shortcuts import render, redirect
 from django.db import connection
+from django.db.models import Q
 
 from server_software.models import Software, Request, SoftwareInRequest
 
@@ -9,7 +10,15 @@ USER_ID = 1
 
 
 def get_request_data(request_id: int):
-    req = Request.objects.filter(id=request_id).first()
+    req = Request.objects.filter(~Q(status=Request.RequestStatus.DELETED), id=request_id).first()
+    if req is None:
+        return {
+            'software_list': [],
+            'total': 0,
+            'req_id': request_id,
+            'user_host': '',
+        }
+
     items = SoftwareInRequest.objects.filter(request_id=request_id).select_related('software')
     s = sum([i.software.price for i in items])
     return {
