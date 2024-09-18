@@ -4,7 +4,7 @@ software_list = [
     {
         'id': 0,
         'title': 'Docker',
-        'logo_file_name': '0.png',
+        'logo_file_path': 'http://127.0.0.1:9000/server-soft-logos/0.png',
         'price': 100,
         'time': 10,
         'size': '300 Мб',
@@ -15,7 +15,7 @@ software_list = [
     {
         'id': 1,
         'title': 'NodeJS',
-        'logo_file_name': '1.png',
+        'logo_file_path': 'http://127.0.0.1:9000/server-soft-logos/1.png',
         'price': 150,
         'time': 10,
         'size': '300 Мб',
@@ -25,7 +25,7 @@ software_list = [
     {
         'id': 2,
         'title': 'Python',
-        'logo_file_name': '2.png',
+        'logo_file_path': 'http://127.0.0.1:9000/server-soft-logos/2.png',
         'price': 200,
         'time': 20,
         'size': '100 Мб',
@@ -35,7 +35,7 @@ software_list = [
     {
         'id': 3,
         'title': 'JS',
-        'logo_file_name': '3.png',
+        'logo_file_path': 'http://127.0.0.1:9000/server-soft-logos/3.png',
         'price': 300,
         'time': 43,
         'size': '300 Мб',
@@ -45,7 +45,7 @@ software_list = [
     {
         'id': 4,
         'title': 'git',
-        'logo_file_name': '4.png',
+        'logo_file_path': 'http://127.0.0.1:9000/server-soft-logos/4.png',
         'price': 400,
         'time': 13,
         'size': '100 Мб',
@@ -58,49 +58,36 @@ user_request = [
     {
         'id': 0,
         'title': 'Docker',
-        'logo_file_name': '0.png',
+        'logo_file_path': 'http://127.0.0.1:9000/server-soft-logos/0.png',
         'price': 100,
         'version': '3.0',
     },
     {
         'id': 1,
         'title': 'NodeJS',
-        'logo_file_name': '1.png',
+        'logo_file_path': 'http://127.0.0.1:9000/server-soft-logos/1.png',
         'price': 150,
         'version': '2.0',
     },
     {
         'id': 2,
         'title': 'Python',
-        'logo_file_name': '2.png',
+        'logo_file_path': 'http://127.0.0.1:9000/server-soft-logos/2.png',
         'price': 200,
         'version': '1.0',
     },
 ]
-
-MINIO_HOST = '127.0.0.1'
-MINIO_PORT = 9000
-MINIO_DIR = 'server-soft-logos'
-
-
-def get_image_file_path(file_name: str) -> str:
-    return f'http://{MINIO_HOST}:{MINIO_PORT}/{MINIO_DIR}/{file_name}'
-
 
 def get_software_list(search_query: str):
     res = []
     for software in software_list:
         if software["title"].lower().startswith(search_query.lower()):
             res.append(software)
-            res[-1]['logo_file_path'] = get_image_file_path(software["logo_file_name"])
     return res
 
 
 def get_request_data():
     res = user_request.copy()
-    for i in range(len(res)):
-        res[i]['logo_file_path'] = get_image_file_path(res[i]["logo_file_name"])
-
     s = sum([i['price'] for i in res])
     return {
         'software_list': res,
@@ -123,7 +110,6 @@ def software_list_page(request):
 def software_page(request, id):
     for software in software_list:
         if software['id'] == id:
-            software['logo_file_path'] = get_image_file_path(software["logo_file_name"])
             return render(request, 'software.html',
                           {'data': software})
 
