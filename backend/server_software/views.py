@@ -60,18 +60,21 @@ user_request = [
         'title': 'Docker',
         'logo_file_name': '0.png',
         'price': 100,
+        'version': '3.0',
     },
     {
         'id': 1,
         'title': 'NodeJS',
         'logo_file_name': '1.png',
         'price': 150,
+        'version': '2.0',
     },
     {
         'id': 2,
         'title': 'Python',
         'logo_file_name': '2.png',
         'price': 200,
+        'version': '1.0',
     },
 ]
 
