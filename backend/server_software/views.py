@@ -95,7 +95,7 @@ def add_software_to_cart(request):
     if software_id is not None:
         request_id = get_or_create_user_cart(USER_ID)
         add_item_to_request(request_id, software_id)
-    return redirect('software_list')
+    return get_software_list(request)
 
 
 def software_page(request, id):
@@ -133,7 +133,7 @@ def remove_software_request(request, id: int):
     if action == "delete_request":
         delete_request(id)
         return redirect('software_list')
-    return redirect('install_software_request')
+    return get_software_request(request, id)
 
 
 def get_software_request(request, id: int):
