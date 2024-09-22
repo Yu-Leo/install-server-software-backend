@@ -21,7 +21,9 @@ from server_software import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.software_list_page, name='software_list'),
-    path('software/<int:id>/', views.software_page, name='software_url'),
-    path('install_software_request/<int:id>/', views.request_page, name='install_software_request'),
+    path('', views.get_software_list, name='software_list'),
+    path('add_software_to_cart/', views.add_software_to_cart, name='add_software_to_cart'),
+    path('software/<int:id>/', views.software_page, name='software'),
+    path('install_software_request/<int:id>/', views.get_software_request, name='install_software_request'),
+    path('remove_software_request/<int:id>/', views.remove_software_request, name='remove_software_request'),
 ]

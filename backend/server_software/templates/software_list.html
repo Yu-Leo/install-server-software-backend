@@ -20,7 +20,7 @@
             </a>
         </div>
     </form>
-    <form method="post">
+    <form method="post" action="{% url 'add_software_to_cart' %}">
         {% csrf_token %}
         <div class="row row-cols-1 row-cols-md-2
                     row-cols-lg-4 g-4">
@@ -39,7 +39,7 @@
                             <li class="list-group-item">Цена: <strong>{{ software.price }} руб.</strong></li>
                         </ul>
                         <div class="card-body">
-                            <a href="{% url 'software_url' software.id %}" class="btn dark-blue-btn mb-2">Узнать
+                            <a href="{% url 'software' software.id %}" class="btn dark-blue-btn mb-2">Узнать
                                 подробнее</a>
                             <button class="btn dark-blue-btn" name="add_to_cart" value="{{ software.id }}">Добавить в
                                 заявку

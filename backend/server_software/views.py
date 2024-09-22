@@ -10,9 +10,11 @@ USER_ID = 1
 
 
 def get_request_data(request_id: int):
-    req = InstallSoftwareRequest.objects.filter(~Q(status=InstallSoftwareRequest.RequestStatus.DELETED), id=request_id).first()
+    req = InstallSoftwareRequest.objects.filter(~Q(status=InstallSoftwareRequest.RequestStatus.DELETED),
+                                                id=request_id).first()
     if req is None:
         return {
+            'id': request_id,
             'software_list': [],
             'total': 0,
             'req_id': request_id,
@@ -22,6 +24,7 @@ def get_request_data(request_id: int):
     items = SoftwareInRequest.objects.filter(request_id=request_id).select_related('software')
     s = sum([i.software.price for i in items])
     return {
+        'id': request_id,
         'software_list': items,
         'total': s,
         'req_id': request_id,
@@ -41,7 +44,8 @@ def get_or_create_user_cart(user_id: int) -> int:
     Если у пользователя есть заявка в статусе DRAFT (корзина), возвращает её Id.
     Если нет - создает и возвращает id созданной заявки
     """
-    old_req = InstallSoftwareRequest.objects.filter(client_id=USER_ID, status=InstallSoftwareRequest.RequestStatus.DRAFT).first()
+    old_req = InstallSoftwareRequest.objects.filter(client_id=USER_ID,
+                                                    status=InstallSoftwareRequest.RequestStatus.DRAFT).first()
     if old_req is not None:
         return old_req.id
 
@@ -58,16 +62,10 @@ def add_item_to_request(request_id: int, software_id: int):
     sir.save()
 
 
-def software_list_page(request):
-    if request.method == "POST":
-        data = request.POST
-        software_id = data.get("add_to_cart")
-        if software_id is not None:
-            request_id = get_or_create_user_cart(USER_ID)
-            add_item_to_request(request_id, software_id)
-
+def get_software_list(request):
     software_title = request.GET.get('software_title', '')
-    req = InstallSoftwareRequest.objects.filter(client_id=USER_ID, status=InstallSoftwareRequest.RequestStatus.DRAFT).first()
+    req = InstallSoftwareRequest.objects.filter(client_id=USER_ID,
+                                                status=InstallSoftwareRequest.RequestStatus.DRAFT).first()
     software_list = Software.objects.filter(title__istartswith=software_title, is_active=True)
     return render(request, 'software_list.html',
                   {'data':
@@ -78,6 +76,17 @@ def software_list_page(request):
                           'request_id': (req.id if req is not None else 0),
                       },
                   })
+
+
+def add_software_to_cart(request):
+    if request.method != "POST":
+        return redirect('software_list')
+    data = request.POST
+    software_id = data.get("add_to_cart")
+    if software_id is not None:
+        request_id = get_or_create_user_cart(USER_ID)
+        add_item_to_request(request_id, software_id)
+    return redirect('software_list')
 
 
 def software_page(request, id):
@@ -115,16 +124,21 @@ def form_request(request_id: int, data):
         host=user_host)
 
 
-def request_page(request, id: int):
-    if request.method == "POST":
-        data = request.POST
-        action = data.get("request_action")
-        if action == "delete_request":
-            delete_request(id)
-            return redirect('software_list')
-        elif action == "form_request":
-            form_request(id, data)
-            return redirect('software_list')
+def remove_software_request(request, id: int):
+    if request.method != "POST":
+        return redirect('install_software_request')
 
+    data = request.POST
+    action = data.get("request_action")
+    if action == "delete_request":
+        delete_request(id)
+        return redirect('software_list')
+    elif action == "form_request":
+        form_request(id, data)
+        return redirect('software_list')
+    return redirect('install_software_request')
+
+
+def get_software_request(request, id: int):
     return render(request, 'request.html',
                   {'data': get_request_data(id)})
