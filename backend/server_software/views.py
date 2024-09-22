@@ -4,13 +4,13 @@ from django.shortcuts import render, redirect
 from django.db import connection
 from django.db.models import Q
 
-from server_software.models import Software, Request, SoftwareInRequest
+from server_software.models import Software, InstallSoftwareRequest, SoftwareInRequest
 
 USER_ID = 1
 
 
 def get_request_data(request_id: int):
-    req = Request.objects.filter(~Q(status=Request.RequestStatus.DELETED), id=request_id).first()
+    req = InstallSoftwareRequest.objects.filter(~Q(status=InstallSoftwareRequest.RequestStatus.DELETED), id=request_id).first()
     if req is None:
         return {
             'software_list': [],
@@ -41,11 +41,11 @@ def get_or_create_user_cart(user_id: int) -> int:
     Если у пользователя есть заявка в статусе DRAFT (корзина), возвращает её Id.
     Если нет - создает и возвращает id созданной заявки
     """
-    old_req = Request.objects.filter(client_id=USER_ID, status=Request.RequestStatus.DRAFT).first()
+    old_req = InstallSoftwareRequest.objects.filter(client_id=USER_ID, status=InstallSoftwareRequest.RequestStatus.DRAFT).first()
     if old_req is not None:
         return old_req.id
 
-    new_req = Request(client_id=USER_ID, status=Request.RequestStatus.DRAFT)
+    new_req = InstallSoftwareRequest(client_id=USER_ID, status=InstallSoftwareRequest.RequestStatus.DRAFT)
     new_req.save()
     return new_req.id
 
@@ -67,7 +67,7 @@ def software_list_page(request):
             add_item_to_request(request_id, software_id)
 
     software_title = request.GET.get('software_title', '')
-    req = Request.objects.filter(client_id=USER_ID, status=Request.RequestStatus.DRAFT).first()
+    req = InstallSoftwareRequest.objects.filter(client_id=USER_ID, status=InstallSoftwareRequest.RequestStatus.DRAFT).first()
     software_list = Software.objects.filter(title__istartswith=software_title, is_active=True)
     return render(request, 'software_list.html',
                   {'data':
@@ -95,7 +95,7 @@ def delete_request(request_id: int):
     """
     Удаление заявки по id
     """
-    raw_sql = "UPDATE requests SET status='DELETED' WHERE id=%s "
+    raw_sql = "UPDATE install_software_requests SET status='DELETED' WHERE id=%s "
     with connection.cursor() as cursor:
         cursor.execute(raw_sql, (request_id,))
 
@@ -109,8 +109,8 @@ def form_request(request_id: int, data):
     for i in items:
         SoftwareInRequest.objects.filter(request_id=request_id, software_id=i.software_id).update(
             version=data.get(f'{request_id}-{i.software_id}'))
-    Request.objects.filter(id=request_id).update(
-        status=Request.RequestStatus.FORMED,
+    InstallSoftwareRequest.objects.filter(id=request_id).update(
+        status=InstallSoftwareRequest.RequestStatus.FORMED,
         formation_datetime=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         host=user_host)
 

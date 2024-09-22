@@ -19,7 +19,7 @@ class Software(models.Model):
         db_table = 'software'
 
 
-class Request(models.Model):
+class InstallSoftwareRequest(models.Model):
     class RequestStatus(models.TextChoices):
         DRAFT = "DRAFT"
         DELETED = "DELETED"
@@ -45,11 +45,11 @@ class Request(models.Model):
         return str(self.id)
 
     class Meta:
-        db_table = 'requests'
+        db_table = 'install_software_requests'
 
 
 class SoftwareInRequest(models.Model):
-    request = models.ForeignKey(Request, on_delete=models.CASCADE)
+    request = models.ForeignKey(InstallSoftwareRequest, on_delete=models.CASCADE)
     software = models.ForeignKey(Software, on_delete=models.CASCADE)
     version = models.CharField(max_length=255)
 

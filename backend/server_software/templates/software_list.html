@@ -13,7 +13,7 @@
             <input type="submit" class="btn dark-blue-btn ml-3 mr-3" value="Поиск">
         </div>
         <div class="">
-            <a href="{% url 'request' data.request_id %}"
+            <a href="{% url 'install_software_request' data.request_id %}"
                class="btn dark-blue-border {% if data.items_in_cart == 0 %}inactive-cart{% endif %}">
                 {{ data.items_in_cart }}
                 <img src="{% static 'img/cart.png' %}" width="25" alt="cart">

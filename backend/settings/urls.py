@@ -23,5 +23,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.software_list_page, name='software_list'),
     path('software/<int:id>/', views.software_page, name='software_url'),
-    path('request/<int:id>/', views.request_page, name='request'),
+    path('install_software_request/<int:id>/', views.request_page, name='install_software_request'),
 ]
