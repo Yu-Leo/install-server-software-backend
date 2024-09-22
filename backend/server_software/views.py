@@ -109,21 +109,6 @@ def delete_request(request_id: int):
         cursor.execute(raw_sql, (request_id,))
 
 
-def form_request(request_id: int, data):
-    """
-    Формирование заявки
-    """
-    user_host = data.get('user_host')
-    items = SoftwareInRequest.objects.filter(request_id=request_id)
-    for i in items:
-        SoftwareInRequest.objects.filter(request_id=request_id, software_id=i.software_id).update(
-            version=data.get(f'{request_id}-{i.software_id}'))
-    InstallSoftwareRequest.objects.filter(id=request_id).update(
-        status=InstallSoftwareRequest.RequestStatus.FORMED,
-        formation_datetime=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-        host=user_host)
-
-
 def remove_software_request(request, id: int):
     if request.method != "POST":
         return redirect('install_software_request')
@@ -132,9 +117,6 @@ def remove_software_request(request, id: int):
     action = data.get("request_action")
     if action == "delete_request":
         delete_request(id)
-        return redirect('software_list')
-    elif action == "form_request":
-        form_request(id, data)
         return redirect('software_list')
     return redirect('install_software_request')
 
