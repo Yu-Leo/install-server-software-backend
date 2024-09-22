@@ -10,6 +10,9 @@ USER_ID = 1
 
 
 def get_request_data(request_id: int):
+    """
+    Формирование данных по заявке
+    """
     req = InstallSoftwareRequest.objects.filter(~Q(status=InstallSoftwareRequest.RequestStatus.DELETED),
                                                 id=request_id).first()
     if req is None:
@@ -63,6 +66,9 @@ def add_item_to_request(request_id: int, software_id: int):
 
 
 def get_software_list(request):
+    """
+    Получение страницы списка услуг
+    """
     software_title = request.GET.get('software_title', '')
     req = InstallSoftwareRequest.objects.filter(client_id=USER_ID,
                                                 status=InstallSoftwareRequest.RequestStatus.DRAFT).first()
@@ -79,6 +85,9 @@ def get_software_list(request):
 
 
 def add_software_to_cart(request):
+    """
+    Добавление услуги в заявку
+    """
     if request.method != "POST":
         return redirect('software_list')
     data = request.POST
@@ -90,6 +99,9 @@ def add_software_to_cart(request):
 
 
 def software_page(request, id):
+    """
+    Получение страницы услуги
+    """
     data = Software.objects.filter(id=id).first()
     if data is None:
         return render(request, 'software.html')
@@ -110,6 +122,9 @@ def delete_request(request_id: int):
 
 
 def remove_software_request(request, id: int):
+    """
+    Удаление услуги из заявки
+    """
     if request.method != "POST":
         return redirect('install_software_request')
 
@@ -122,5 +137,8 @@ def remove_software_request(request, id: int):
 
 
 def get_software_request(request, id: int):
+    """
+    Получение страницы заявки
+    """
     return render(request, 'request.html',
                   {'data': get_request_data(id)})
