@@ -25,9 +25,9 @@ urlpatterns = [
 
     # Software
 
-    path('software/', views.GetSoftwareList, name='software_list'),
+    path('software', views.GetSoftwareList, name='software_list'),
     path('software/post', views.PostSoftware, name='software_post'),
-    path('software/<int:pk>/', views.GetSoftware, name='software'),
+    path('software/<int:pk>', views.GetSoftware, name='software'),
     path('software/<int:pk>/delete', views.DeleteSoftware, name='software_delete'),
     path('software/<int:pk>/put', views.PutSoftware, name='software_put'),
     path('software/<int:pk>/add', views.PostSoftwareToRequest, name='software_add'),
@@ -35,7 +35,7 @@ urlpatterns = [
     # InstallSoftwareRequest
 
     path('install_software_requests', views.GetInstallSoftwareRequests, name='install_software_requests'),
-    path('install_software_requests/<int:pk>/', views.GetInstallSoftwareRequest, name='install_software_request'),
+    path('install_software_requests/<int:pk>', views.GetInstallSoftwareRequest, name='install_software_request'),
     path('install_software_requests/<int:pk>/put', views.PutInstallSoftwareRequest,
          name='install_software_request_put'),
     path('install_software_requests/<int:pk>/form', views.FormInstallSoftwareRequest,

@@ -11,7 +11,7 @@ class SoftwareSerializer(serializers.ModelSerializer):
 class InstallSoftwareRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = InstallSoftwareRequest
-        fields = ["pk", "creation_datetime", "formation_datetime", "completion_datetime", "host", "client", "manager", "total_installing_time_in_min"]
+        fields = ["pk", "creation_datetime", "formation_datetime", "completion_datetime", "host", "client", "manager", "total_installing_time_in_min", "status"]
 
 class SoftwareInRequestSerializer(serializers.ModelSerializer):
     class Meta:

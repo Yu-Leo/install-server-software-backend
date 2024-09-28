@@ -1,9 +1,12 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import *
 from rest_framework import status
+from django.db.models import Q
+from dateutil.parser import parse
 
 from .models import Software, InstallSoftwareRequest, SoftwareInRequest
-from server_software.serializers import SoftwareInRequestSerializer, SoftwareSerializer
+from server_software.serializers import InstallSoftwareRequestSerializer, SoftwareInRequestSerializer, \
+    SoftwareSerializer
 
 USER_ID = 1
 
@@ -132,7 +135,22 @@ def GetInstallSoftwareRequests(request):
     """
     Получение списка заявок на установку ПО
     """
-    return Response("Not implemented", status=501)  # TODO
+    status_filter = request.query_params.get("status")
+    formation_datetime_start_filter = request.query_params.get("formation_start")
+    formation_datetime_end_filter = request.query_params.get("formation_end")
+
+    filters = ~Q(status=InstallSoftwareRequest.RequestStatus.DELETED)
+    if status_filter is not None:
+        filters &= Q(status=status_filter.upper())
+    if formation_datetime_start_filter is not None:
+        filters &= Q(formation_datetime__gte=parse(formation_datetime_start_filter))
+    if formation_datetime_end_filter is not None:
+        filters &= Q(formation_datetime__lte=parse(formation_datetime_end_filter))
+
+    install_software_requests = InstallSoftwareRequest.objects.filter(filters)
+    serializer = InstallSoftwareRequestSerializer(install_software_requests, many=True)
+
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 @api_view(['GET'])
