@@ -1,0 +1,362 @@
+{
+	"info": {
+		"_postman_id": "384fb5cb-eb13-4b70-a955-93e1f8c60a53",
+		"name": "bmstu-iu5-web",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "21953270"
+	},
+	"item": [
+		{
+			"name": "software_list",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8000/software?software_title=da",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"software"
+					],
+					"query": [
+						{
+							"key": "software_title",
+							"value": "da"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "software_post",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"title\": \"Some\",\n    \"price\": 123,\n    \"installing_time_in_mins\": 12,\n    \"size_in_bytes\": 10,\n    \"summary\": \"summary\",\n    \"description\": \"description\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8000/software/post",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"software",
+						"post"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "software",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8000/software/16",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"software",
+						"16"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "software_delete",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8000/software/13/delete",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"software",
+						"13",
+						"delete"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "software_put",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"title\": \"asdf\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8000/software/15/put",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"software",
+						"15",
+						"put"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "software_add",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8000/software/13/add",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"software",
+						"13",
+						"add"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "install_software_requests",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8000/install_software_requests?status=formed&formation_start=2024-08-10&formation_end=2024-09-15T10:00:00",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"install_software_requests"
+					],
+					"query": [
+						{
+							"key": "status",
+							"value": "formed"
+						},
+						{
+							"key": "formation_start",
+							"value": "2024-08-10"
+						},
+						{
+							"key": "formation_end",
+							"value": "2024-09-15T10:00:00"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "install_software_request",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8000/install_software_requests/37",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"install_software_requests",
+						"37"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "install_software_request_put",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"host\": \"123.9.9.10\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8000/install_software_requests/41/put",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"install_software_requests",
+						"41",
+						"put"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "install_software_request_form",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8000/install_software_requests/41/form",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"install_software_requests",
+						"41",
+						"form"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "install_software_request_resolve",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"status\": \"COMPLETED\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8000/install_software_requests/41/resolve",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"install_software_requests",
+						"41",
+						"resolve"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "install_software_request_delete",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8000/install_software_requests/40/delete",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"install_software_requests",
+						"40",
+						"delete"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "software_in_request_put",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"version\": \"v1.234\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8000/software_in_request/56/put",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"software_in_request",
+						"56",
+						"put"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "software_in_request_delete",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8000/software_in_request/57/delete",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"software_in_request",
+						"57",
+						"delete"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
