@@ -1,5 +1,9 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import *
+from rest_framework import status
+
+from .models import Software
+from server_software.serializers import SoftwareSerializer
 
 
 # Software
@@ -7,7 +11,7 @@ from rest_framework.response import *
 @api_view(['GET'])
 def GetSoftwareList(request):
     """
-    Получение списка программ
+    Получение списка ПО
     """
     return Response("Not implemented", status=501)  # TODO
 
@@ -23,15 +27,19 @@ def PostSoftware(request):
 @api_view(['GET'])
 def GetSoftware(request, pk):
     """
-    Получение программы
+    Получение ПО
     """
-    return Response("Not implemented", status=501)  # TODO
+    software = Software.objects.filter(id=pk, is_active=True).first()
+    if software is None:
+        return Response("Software not found", status=status.HTTP_404_NOT_FOUND)
+    serialized_software = SoftwareSerializer(software)
+    return Response(serialized_software.data, status=status.HTTP_200_OK)
 
 
 @api_view(['DELETE'])
 def DeleteSoftware(request, pk):
     """
-    Удаление программы
+    Удаление ПО
     """
     return Response("Not implemented", status=501)  # TODO
 
@@ -39,7 +47,7 @@ def DeleteSoftware(request, pk):
 @api_view(['PUT'])
 def PutSoftware(request, pk):
     """
-    Изменение программы
+    Изменение ПО
     """
     return Response("Not implemented", status=501)  # TODO
 
@@ -47,7 +55,7 @@ def PutSoftware(request, pk):
 @api_view(['POST'])
 def PostSoftwareToRequest(request, pk):
     """
-    Добавление программы в заявку на установку
+    Добавление ПО в заявку на установку
     """
     return Response("Not implemented", status=501)  # TODO
 
