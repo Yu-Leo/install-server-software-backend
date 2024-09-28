@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from rest_framework.decorators import api_view
 from rest_framework.response import *
 from rest_framework import status
@@ -188,8 +190,18 @@ def FormInstallSoftwareRequest(request, pk):
     """
     Формирование заявки на установку ПО
     """
+    install_software_request = InstallSoftwareRequest.objects.filter(id=pk,
+                                                                     status=InstallSoftwareRequest.RequestStatus.DRAFT).first()
+    if install_software_request is None:
+        return Response("InstallSoftwareRequest not found", status=status.HTTP_404_NOT_FOUND)
 
-    return Response("Not implemented", status=501)  # TODO
+    if install_software_request.host is None or install_software_request.host == "":
+        return Response("InstallSoftwareRequest.host is empty", status=status.HTTP_400_BAD_REQUEST)
+
+    install_software_request.status = InstallSoftwareRequest.RequestStatus.FORMED
+    install_software_request.formation_datetime = datetime.now()
+    install_software_request.save()
+    return Response(status=status.HTTP_200_OK)
 
 
 @api_view(['PUT'])
