@@ -3,7 +3,7 @@ from rest_framework.response import *
 from rest_framework import status
 
 from .models import Software, InstallSoftwareRequest, SoftwareInRequest
-from server_software.serializers import SoftwareSerializer
+from server_software.serializers import SoftwareInRequestSerializer, SoftwareSerializer
 
 USER_ID = 1
 
@@ -160,7 +160,17 @@ def PutSoftwareInRequest(request, pk):
     """
     Изменение данных о ПО в заявке
     """
-    return Response("Not implemented", status=501)  # TODO
+    software_in_request = SoftwareInRequest.objects.filter(id=pk).first()
+    if software_in_request is None:
+        return Response("SoftwareInRequest not found", status=status.HTTP_404_NOT_FOUND)
+    serializer = SoftwareInRequestSerializer(software_in_request, data=request.data, partial=True)
+    if serializer.is_valid():
+        serializer.save()
+        software_in_request = SoftwareInRequest.objects.get(id=pk)
+        serializer = SoftwareInRequestSerializer(software_in_request)
+        return Response(serializer.data)
+    else:
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['DELETE'])
