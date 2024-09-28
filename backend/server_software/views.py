@@ -15,7 +15,18 @@ def GetSoftwareList(request):
     """
     Получение списка ПО
     """
-    return Response("Not implemented", status=501)  # TODO
+    software_title = request.query_params.get("software_title", "")
+    req = InstallSoftwareRequest.objects.filter(client_id=USER_ID,
+                                                status=InstallSoftwareRequest.RequestStatus.DRAFT).first()
+    software_list = Software.objects.filter(title__istartswith=software_title, is_active=True)
+
+    serializer = SoftwareSerializer(software_list, many=True)
+    return Response(
+        {
+            "software": serializer.data,
+            "install_software_request_id": req.id if req else None
+        },
+        status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])
