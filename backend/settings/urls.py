@@ -15,15 +15,39 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 
 from server_software import views
 
 urlpatterns = [
+    path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('admin/', admin.site.urls),
-    path('', views.get_software_list, name='software_list'),
-    path('add_software_to_cart/', views.add_software_to_cart, name='add_software_to_cart'),
-    path('software/<int:id>/', views.software_page, name='software'),
-    path('install_software_request/<int:id>/', views.get_software_request, name='install_software_request'),
-    path('remove_software_request/<int:id>/', views.remove_software_request, name='remove_software_request'),
+
+    # Software
+
+    path('software/', views.GetSoftwareList, name='software_list'),
+    path('software/post', views.PostSoftware, name='software_post'),
+    path('software/<int:pk>/', views.GetSoftware, name='software'),
+    path('software/<int:pk>/delete', views.DeleteSoftware, name='software_delete'),
+    path('software/<int:pk>/put', views.PutSoftware, name='software_put'),
+    path('software/<int:pk>/add', views.PostSoftwareToRequest, name='software_add'),
+
+    # InstallSoftwareRequest
+
+    path('install_software_requests', views.GetInstallSoftwareRequests, name='install_software_requests'),
+    path('install_software_requests/<int:pk>/', views.GetInstallSoftwareRequest, name='install_software_request'),
+    path('install_software_requests/<int:pk>/put', views.PutInstallSoftwareRequest,
+         name='install_software_request_put'),
+    path('install_software_requests/<int:pk>/form', views.FormInstallSoftwareRequest,
+         name='install_software_request_form'),
+    path('install_software_requests/<int:pk>/resolve', views.ResolveInstallSoftwareRequest,
+         name='install_software_request_resolve'),
+    path('install_software_requests/<int:pk>/delete', views.DeleteInstallSoftwareRequest,
+         name='install_software_request_delete'),
+
+    # SoftwareInRequest
+
+    path('software_in_request/<int:pk>/put', views.PutSoftwareInRequest, name='software_in_request_put'),
+    path('software_in_request/<int:pk>/delete', views.DeleteSoftwareInRequest, name='software_in_request_delete'),
+
 ]

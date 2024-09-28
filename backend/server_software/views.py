@@ -1,144 +1,118 @@
-from datetime import datetime
-
-from django.shortcuts import render, redirect
-from django.db import connection
-from django.db.models import Q
-
-from server_software.models import Software, InstallSoftwareRequest, SoftwareInRequest
-
-USER_ID = 1
+from rest_framework.decorators import api_view
+from rest_framework.response import *
 
 
-def get_request_data(request_id: int):
+# Software
+
+@api_view(['GET'])
+def GetSoftwareList(request):
     """
-    Формирование данных по заявке
+    Получение списка программ
     """
-    req = InstallSoftwareRequest.objects.filter(~Q(status=InstallSoftwareRequest.RequestStatus.DELETED),
-                                                id=request_id).first()
-    if req is None:
-        return {
-            'id': request_id,
-            'software_list': [],
-            'total': 0,
-            'req_id': request_id,
-            'user_host': '',
-        }
-
-    items = SoftwareInRequest.objects.filter(request_id=request_id).select_related('software')
-    s = sum([i.software.price for i in items])
-    return {
-        'id': request_id,
-        'software_list': items,
-        'total': s,
-        'req_id': request_id,
-        'user_host': req.host,
-    }
+    return Response("Not implemented", status=501)  # TODO
 
 
-def get_items_in_request(request_id: int) -> int:
+@api_view(['POST'])
+def PostSoftware(request):
     """
-    Получение колическа элементов в заявке по её id
+    Добавление программы
     """
-    return SoftwareInRequest.objects.filter(request_id=request_id).select_related('software').count()
+    return Response("Not implemented", status=501)  # TODO
 
 
-def get_or_create_user_cart(user_id: int) -> int:
+@api_view(['GET'])
+def GetSoftware(request, pk):
     """
-    Если у пользователя есть заявка в статусе DRAFT (корзина), возвращает её Id.
-    Если нет - создает и возвращает id созданной заявки
+    Получение программы
     """
-    old_req = InstallSoftwareRequest.objects.filter(client_id=USER_ID,
-                                                    status=InstallSoftwareRequest.RequestStatus.DRAFT).first()
-    if old_req is not None:
-        return old_req.id
-
-    new_req = InstallSoftwareRequest(client_id=USER_ID, status=InstallSoftwareRequest.RequestStatus.DRAFT)
-    new_req.save()
-    return new_req.id
+    return Response("Not implemented", status=501)  # TODO
 
 
-def add_item_to_request(request_id: int, software_id: int):
+@api_view(['DELETE'])
+def DeleteSoftware(request, pk):
     """
-    Добавление услуги в заявку
+    Удаление программы
     """
-    sir = SoftwareInRequest(request_id=request_id, software_id=software_id)
-    sir.save()
+    return Response("Not implemented", status=501)  # TODO
 
 
-def get_software_list(request):
+@api_view(['PUT'])
+def PutSoftware(request, pk):
     """
-    Получение страницы списка услуг
+    Изменение программы
     """
-    software_title = request.GET.get('software_title', '')
-    req = InstallSoftwareRequest.objects.filter(client_id=USER_ID,
-                                                status=InstallSoftwareRequest.RequestStatus.DRAFT).first()
-    software_list = Software.objects.filter(title__istartswith=software_title, is_active=True)
-    return render(request, 'software_list.html',
-                  {'data':
-                      {
-                          'software_list': software_list,
-                          'items_in_cart': (get_items_in_request(req.id) if req is not None else 0),
-                          'software_title': software_title,
-                          'request_id': (req.id if req is not None else 0),
-                      },
-                  })
+    return Response("Not implemented", status=501)  # TODO
 
 
-def add_software_to_cart(request):
+@api_view(['POST'])
+def PostSoftwareToRequest(request, pk):
     """
-    Добавление услуги в заявку
+    Добавление программы в заявку на установку
     """
-    if request.method != "POST":
-        return redirect('software_list')
-    data = request.POST
-    software_id = data.get("add_to_cart")
-    if software_id is not None:
-        request_id = get_or_create_user_cart(USER_ID)
-        add_item_to_request(request_id, software_id)
-    return get_software_list(request)
+    return Response("Not implemented", status=501)  # TODO
 
 
-def software_page(request, id):
+# InstallSoftwareRequest
+
+@api_view(['GET'])
+def GetInstallSoftwareRequests(request):
     """
-    Получение страницы услуги
+    Получение списка заявок на установку ПО
     """
-    data = Software.objects.filter(id=id).first()
-    if data is None:
-        return render(request, 'software.html')
-
-    return render(request, 'software.html',
-                  {'data': {
-                      'software': data,
-                  }})
+    return Response("Not implemented", status=501)  # TODO
 
 
-def delete_request(request_id: int):
+@api_view(['GET'])
+def GetInstallSoftwareRequest(request, pk):
     """
-    Удаление заявки по id
+    Получение заявки на установку ПО
     """
-    raw_sql = "UPDATE install_software_requests SET status='DELETED' WHERE id=%s "
-    with connection.cursor() as cursor:
-        cursor.execute(raw_sql, (request_id,))
+    return Response("Not implemented", status=501)  # TODO
 
 
-def remove_software_request(request, id: int):
+@api_view(['PUT'])
+def PutInstallSoftwareRequest(request, pk):
     """
-    Удаление услуги из заявки
+    Изменение заявки на установку ПО
     """
-    if request.method != "POST":
-        return redirect('install_software_request')
-
-    data = request.POST
-    action = data.get("request_action")
-    if action == "delete_request":
-        delete_request(id)
-        return redirect('software_list')
-    return get_software_request(request, id)
+    return Response("Not implemented", status=501)  # TODO
 
 
-def get_software_request(request, id: int):
+@api_view(['PUT'])
+def FormInstallSoftwareRequest(request, pk):
     """
-    Получение страницы заявки
+    Формирование заявки на установку ПО
     """
-    return render(request, 'request.html',
-                  {'data': get_request_data(id)})
+    return Response("Not implemented", status=501)  # TODO
+
+
+@api_view(['PUT'])
+def ResolveInstallSoftwareRequest(request, pk):
+    """
+    Закрытие заявки на установку ПО модератором
+    """
+    return Response("Not implemented", status=501)  # TODO
+
+
+@api_view(['DELETE'])
+def DeleteInstallSoftwareRequest(request, pk):
+    """
+    Удаление заявки на установку ПО
+    """
+    return Response("Not implemented", status=501)  # TODO
+
+
+@api_view(['PUT'])
+def PutSoftwareInRequest(request, pk):
+    """
+    Изменение данных о ПО в заявке
+    """
+    return Response("Not implemented", status=501)  # TODO
+
+
+@api_view(['DELETE'])
+def DeleteSoftwareInRequest(request, pk):
+    """
+    Удаление ПО из заявки
+    """
+    return Response("Not implemented", status=501)  # TODO
