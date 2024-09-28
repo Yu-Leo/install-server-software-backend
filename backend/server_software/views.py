@@ -168,4 +168,8 @@ def DeleteSoftwareInRequest(request, pk):
     """
     Удаление ПО из заявки
     """
-    return Response("Not implemented", status=501)  # TODO
+    software_in_request = SoftwareInRequest.objects.filter(id=pk).first()
+    if software_in_request is None:
+        return Response("SoftwareInRequest not found", status=status.HTTP_404_NOT_FOUND)
+    software_in_request.delete()
+    return Response(status=status.HTTP_200_OK)
