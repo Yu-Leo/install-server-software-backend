@@ -41,7 +41,14 @@ def DeleteSoftware(request, pk):
     """
     Удаление ПО
     """
-    return Response("Not implemented", status=501)  # TODO
+    software = Software.objects.filter(id=pk, is_active=True).first()
+    if software is None:
+        return Response("Software not found", status=status.HTTP_404_NOT_FOUND)
+    software.is_active = False
+    software.save()
+
+    # TODO: удаление изображения
+    return Response(status=status.HTTP_200_OK)
 
 
 @api_view(['PUT'])
