@@ -205,7 +205,8 @@ def FormInstallSoftwareRequest(request, pk):
     install_software_request.status = InstallSoftwareRequest.RequestStatus.FORMED
     install_software_request.formation_datetime = datetime.now()
     install_software_request.save()
-    return Response(status=status.HTTP_200_OK)
+    serializer = InstallSoftwareRequestSerializer(install_software_request)
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 @api_view(['PUT'])
