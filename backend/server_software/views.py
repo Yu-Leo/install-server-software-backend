@@ -75,7 +75,18 @@ def PutSoftware(request, pk):
     """
     Изменение ПО
     """
-    return Response("Not implemented", status=501)  # TODO
+    software = Software.objects.filter(id=pk).first()
+    if software is None:
+        return Response("Software not found", status=status.HTTP_404_NOT_FOUND)
+
+    serializer = SoftwareSerializer(software, data=request.data, partial=True)
+    if serializer.is_valid():
+        serializer.save()
+        software = Software.objects.get(id=pk)
+        serializer = SoftwareSerializer(software)
+        return Response(serializer.data)
+    else:
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['POST'])
