@@ -23,7 +23,13 @@ def PostSoftware(request):
     """
     Добавление ПО
     """
-    return Response("Not implemented", status=501)  # TODO
+    serializer = SoftwareSerializer(data=request.data)
+    if not serializer.is_valid():
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    new_software = serializer.save()
+    serializer = SoftwareSerializer(new_software)
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 @api_view(['GET'])
