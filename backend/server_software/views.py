@@ -5,12 +5,14 @@ from rest_framework.response import *
 from rest_framework import status
 from django.db.models import Q
 from dateutil.parser import parse
+from django.contrib.auth.models import User
 
 from .models import Software, InstallSoftwareRequest, SoftwareInRequest
 from server_software.serializers import InstallSoftwareRequestSerializer, SoftwareInRequestSerializer, \
     SoftwareSerializer
 
-USER_ID = 1
+SINGLETON_USER = User(id=1, username="admin")
+SINGLETON_MANAGER = User(id=2, username="manager")
 
 
 # Software
@@ -21,7 +23,7 @@ def GetSoftwareList(request):
     Получение списка ПО
     """
     software_title = request.query_params.get("software_title", "")
-    req = InstallSoftwareRequest.objects.filter(client_id=USER_ID,
+    req = InstallSoftwareRequest.objects.filter(client_id=SINGLETON_USER.id,
                                                 status=InstallSoftwareRequest.RequestStatus.DRAFT).first()
     software_list = Software.objects.filter(title__istartswith=software_title, is_active=True)
 
@@ -102,7 +104,7 @@ def PostSoftwareToRequest(request, pk):
     software = Software.objects.filter(id=pk, is_active=True).first()
     if software is None:
         return Response("Software not found", status=status.HTTP_404_NOT_FOUND)
-    request_id = get_or_create_user_cart(USER_ID)
+    request_id = get_or_create_user_cart(SINGLETON_USER.id)
     add_item_to_request(request_id, pk)
     return Response(status=status.HTTP_200_OK)
 
@@ -112,12 +114,13 @@ def get_or_create_user_cart(user_id: int) -> int:
     Если у пользователя есть заявка в статусе DRAFT (корзина), возвращает её Id.
     Если нет - создает и возвращает id созданной заявки
     """
-    old_req = InstallSoftwareRequest.objects.filter(client_id=USER_ID,
+    old_req = InstallSoftwareRequest.objects.filter(client_id=SINGLETON_USER.id,
                                                     status=InstallSoftwareRequest.RequestStatus.DRAFT).first()
     if old_req is not None:
         return old_req.id
 
-    new_req = InstallSoftwareRequest(client_id=USER_ID, status=InstallSoftwareRequest.RequestStatus.DRAFT)
+    new_req = InstallSoftwareRequest(client_id=SINGLETON_USER.id,
+                                     status=InstallSoftwareRequest.RequestStatus.DRAFT)
     new_req.save()
     return new_req.id
 
@@ -173,6 +176,7 @@ def PutInstallSoftwareRequest(request, pk):
     if install_software_request is None:
         return Response("InstallSoftwareRequest not found", status=status.HTTP_404_NOT_FOUND)
 
+    # TODO: проверять, что можем поменять только host
     serializer = InstallSoftwareRequestSerializer(install_software_request,
                                                   data=request.data,
                                                   partial=True)
@@ -209,7 +213,35 @@ def ResolveInstallSoftwareRequest(request, pk):
     """
     Закрытие заявки на установку ПО модератором
     """
-    return Response("Not implemented", status=501)  # TODO
+    install_software_request = InstallSoftwareRequest.objects.filter(id=pk,
+                                                                     status=InstallSoftwareRequest.RequestStatus.FORMED).first()
+    if install_software_request is None:
+        return Response("InstallSoftwareRequest not found", status=status.HTTP_404_NOT_FOUND)
+
+    # TODO: проверять, что можем поменять только status на COMPLETED или REJECTED
+    serializer = InstallSoftwareRequestSerializer(install_software_request,
+                                                  data=request.data,
+                                                  partial=True)
+    if not serializer.is_valid():
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    serializer.save()
+    install_software_request = InstallSoftwareRequest.objects.get(id=pk)
+
+    install_software_request.completion_datetime = datetime.now()
+    install_software_request.total_installing_time_in_min = calculate_total_installing_time_for_req(pk)
+    install_software_request.SINGLETON_MANAGER = SINGLETON_MANAGER
+    install_software_request.save()
+
+    serializer = InstallSoftwareRequestSerializer(install_software_request)
+    return Response(serializer.data)
+
+def calculate_total_installing_time_for_req(pk):
+    """
+    Расчет суммарного времени на установку всего ПО из заявки
+    """
+    soft = SoftwareInRequest.objects.select_related("software").filter(request=pk)
+    return sum([s.software.installing_time_in_mins for s in soft])
 
 
 @api_view(['DELETE'])
@@ -217,7 +249,6 @@ def DeleteInstallSoftwareRequest(request, pk):
     """
     Удаление заявки на установку ПО
     """
-
     install_software_request = InstallSoftwareRequest.objects.filter(id=pk,
                                                                      status=InstallSoftwareRequest.RequestStatus.DRAFT).first()
     if install_software_request is None:
