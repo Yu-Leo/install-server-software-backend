@@ -166,7 +166,21 @@ def PutInstallSoftwareRequest(request, pk):
     """
     Изменение заявки на установку ПО
     """
-    return Response("Not implemented", status=501)  # TODO
+    install_software_request = InstallSoftwareRequest.objects.filter(id=pk,
+                                                                     status=InstallSoftwareRequest.RequestStatus.DRAFT).first()
+    if install_software_request is None:
+        return Response("InstallSoftwareRequest not found", status=status.HTTP_404_NOT_FOUND)
+
+    serializer = InstallSoftwareRequestSerializer(install_software_request,
+                                                  data=request.data,
+                                                  partial=True)
+    if serializer.is_valid():
+        serializer.save()
+        install_software_request = InstallSoftwareRequest.objects.get(id=pk)
+        serializer = InstallSoftwareRequestSerializer(install_software_request)
+        return Response(serializer.data)
+    else:
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['PUT'])
@@ -174,6 +188,7 @@ def FormInstallSoftwareRequest(request, pk):
     """
     Формирование заявки на установку ПО
     """
+
     return Response("Not implemented", status=501)  # TODO
 
 
