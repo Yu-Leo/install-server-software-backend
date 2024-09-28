@@ -2,8 +2,10 @@ from rest_framework.decorators import api_view
 from rest_framework.response import *
 from rest_framework import status
 
-from .models import Software
+from .models import Software, InstallSoftwareRequest, SoftwareInRequest
 from server_software.serializers import SoftwareSerializer
+
+USER_ID = 1
 
 
 # Software
@@ -19,7 +21,7 @@ def GetSoftwareList(request):
 @api_view(['POST'])
 def PostSoftware(request):
     """
-    Добавление программы
+    Добавление ПО
     """
     return Response("Not implemented", status=501)  # TODO
 
@@ -64,7 +66,35 @@ def PostSoftwareToRequest(request, pk):
     """
     Добавление ПО в заявку на установку
     """
-    return Response("Not implemented", status=501)  # TODO
+    software = Software.objects.filter(id=pk, is_active=True).first()
+    if software is None:
+        return Response("Software not found", status=status.HTTP_404_NOT_FOUND)
+    request_id = get_or_create_user_cart(USER_ID)
+    add_item_to_request(request_id, pk)
+    return Response(status=status.HTTP_200_OK)
+
+
+def get_or_create_user_cart(user_id: int) -> int:
+    """
+    Если у пользователя есть заявка в статусе DRAFT (корзина), возвращает её Id.
+    Если нет - создает и возвращает id созданной заявки
+    """
+    old_req = InstallSoftwareRequest.objects.filter(client_id=USER_ID,
+                                                    status=InstallSoftwareRequest.RequestStatus.DRAFT).first()
+    if old_req is not None:
+        return old_req.id
+
+    new_req = InstallSoftwareRequest(client_id=USER_ID, status=InstallSoftwareRequest.RequestStatus.DRAFT)
+    new_req.save()
+    return new_req.id
+
+
+def add_item_to_request(request_id: int, software_id: int):
+    """
+    Добавление услуги в заявку
+    """
+    sir = SoftwareInRequest(request_id=request_id, software_id=software_id)
+    sir.save()
 
 
 # InstallSoftwareRequest
