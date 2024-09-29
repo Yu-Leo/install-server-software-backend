@@ -86,7 +86,7 @@
 				"method": "DELETE",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8000/software/13/delete",
+					"raw": "http://localhost:8000/software/16/delete",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -94,7 +94,7 @@
 					"port": "8000",
 					"path": [
 						"software",
-						"13",
+						"16",
 						"delete"
 					]
 				}
@@ -228,7 +228,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8000/install_software_requests/37",
+					"raw": "http://localhost:8000/install_software_requests/41",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -236,7 +236,7 @@
 					"port": "8000",
 					"path": [
 						"install_software_requests",
-						"37"
+						"41"
 					]
 				}
 			},
@@ -249,7 +249,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"host\": \"123.9.9.10\"\n}",
+					"raw": "{\n    \"status\": \"COMPLETED\",\n    \"host\": \"1234\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -300,7 +300,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"status\": \"COMPLETED\"\n}",
+					"raw": "{\n    \"status\": \"COMPLETED\",\n    \"host\": \"123\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -351,7 +351,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"version\": \"v1.234\"\n}",
+					"raw": "{\n    \"version\": \"v1.2345\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -359,7 +359,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8000/software_in_request/56/put",
+					"raw": "http://localhost:8000/software_in_request/61/put",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -367,7 +367,7 @@
 					"port": "8000",
 					"path": [
 						"software_in_request",
-						"56",
+						"61",
 						"put"
 					]
 				}
@@ -390,6 +390,131 @@
 						"software_in_request",
 						"57",
 						"delete"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "users_create",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"test\",\n    \"password\": \"12345678\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8000/users/create",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"users",
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "users_login",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "username",
+							"value": "test",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "12345678",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8000/users/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"users",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "users_logout",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Token 753904112ede9239d379d972f14b7c5496f1cf04",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8000/users/logout",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"users",
+						"logout"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "users_update",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Token 753904112ede9239d379d972f14b7c5496f1cf04",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"test1@example.com\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8000/users/update",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"users",
+						"update"
 					]
 				}
 			},
