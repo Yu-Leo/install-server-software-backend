@@ -59,7 +59,7 @@ def post_software_image(request, pk):
     """
     Загрузка изображения ПО в Minio
     """
-    software = Software.objects.filter(id=pk).first()
+    software = Software.objects.filter(id=pk, is_active=True).first()
     if software is None:
         return Response("Software not found", status=status.HTTP_404_NOT_FOUND)
 
@@ -105,10 +105,23 @@ def delete_software(request, pk):
     software = Software.objects.filter(id=pk, is_active=True).first()
     if software is None:
         return Response("Software not found", status=status.HTTP_404_NOT_FOUND)
+
+    if software.logo_file_path != "":
+        minio_storage = MinioStorage(endpoint=settings.MINIO_ENDPOINT_URL,
+                                     access_key=settings.MINIO_ACCESS_KEY,
+                                     secret_key=settings.MINIO_SECRET_KEY,
+                                     secure=settings.MINIO_SECURE)
+        file_extension = os.path.splitext(software.logo_file_path)[1]
+        file_name = f"{pk}{file_extension}"
+        try:
+            minio_storage.delete_file(settings.MINIO_BUCKET_NAME, file_name)
+        except Exception as e:
+            return Response(f"Failed to delete image: {e}",
+                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        software.logo_file_path = ""
+
     software.is_active = False
     software.save()
-
-    # TODO: удаление изображения
     return Response(status=status.HTTP_200_OK)
 
 
@@ -117,7 +130,7 @@ def put_software(request, pk):
     """
     Изменение ПО
     """
-    software = Software.objects.filter(id=pk).first()
+    software = Software.objects.filter(id=pk, is_active=True).first()
     if software is None:
         return Response("Software not found", status=status.HTTP_404_NOT_FOUND)
 
