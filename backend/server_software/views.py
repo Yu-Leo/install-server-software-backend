@@ -1,3 +1,4 @@
+import os
 from datetime import datetime
 
 from rest_framework.decorators import api_view
@@ -7,6 +8,9 @@ from django.db.models import Q
 from dateutil.parser import parse
 from django.contrib.auth.models import User
 
+from settings import settings
+from settings.settings import MINIO_BUCKET_NAME, MINIO_ENDPOINT_URL, MINIO_SECURE
+from .minio import MinioStorage
 from .models import Software, InstallSoftwareRequest, SoftwareInRequest
 from server_software.serializers import InstallSoftwareRequestSerializer, SoftwareInRequestSerializer, \
     SoftwareSerializer
@@ -48,6 +52,37 @@ def PostSoftware(request):
     new_software = serializer.save()
     serializer = SoftwareSerializer(new_software)
     return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+def PostSoftwareImage(request, pk):
+    """
+    Загрузка изображения ПО в Minio
+    """
+    software = Software.objects.filter(id=pk).first()
+    if software is None:
+        return Response("Software not found", status=status.HTTP_404_NOT_FOUND)
+
+    minio_storage = MinioStorage(endpoint=settings.MINIO_ENDPOINT_URL,
+                                 access_key=settings.MINIO_ACCESS_KEY,
+                                 secret_key=settings.MINIO_SECRET_KEY,
+                                 secure=settings.MINIO_SECURE)
+
+    file = request.FILES.get("image")
+    if not file:
+        return Response("No image in request", status=status.HTTP_400_BAD_REQUEST)
+
+    file_extension = os.path.splitext(file.name)[1]
+    file_name = f"{pk}{file_extension}"
+
+    try:
+        minio_storage.load_file(settings.MINIO_BUCKET_NAME, file_name, file)
+    except Exception as e:
+        return Response(f"Failed to load image: {e}", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    software.logo_file_path = f"http://{MINIO_ENDPOINT_URL}/{MINIO_BUCKET_NAME}/{file_name}"
+    software.save()
+    return Response(status=status.HTTP_200_OK)
 
 
 @api_view(['GET'])
@@ -236,6 +271,7 @@ def ResolveInstallSoftwareRequest(request, pk):
 
     serializer = InstallSoftwareRequestSerializer(install_software_request)
     return Response(serializer.data)
+
 
 def calculate_total_installing_time_for_req(pk):
     """

@@ -31,6 +31,7 @@ urlpatterns = [
     path('software/<int:pk>/delete', views.DeleteSoftware, name='software_delete'),
     path('software/<int:pk>/put', views.PutSoftware, name='software_put'),
     path('software/<int:pk>/add', views.PostSoftwareToRequest, name='software_add'),
+    path('software/<int:pk>/add_image', views.PostSoftwareImage, name='software_add_image'),
 
     # InstallSoftwareRequest
 

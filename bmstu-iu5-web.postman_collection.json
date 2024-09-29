@@ -153,6 +153,43 @@
 			"response": []
 		},
 		{
+			"name": "software_add_image",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "image",
+							"type": "file",
+							"src": "/home/leo/BMSTU/semester05/RIP/lab01-logos/logo-docker.png"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8000/software/16/add_image?image",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"software",
+						"16",
+						"add_image"
+					],
+					"query": [
+						{
+							"key": "image",
+							"value": null
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "install_software_requests",
 			"request": {
 				"method": "GET",

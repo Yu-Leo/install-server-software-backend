@@ -124,3 +124,9 @@ STATICFILES_DIRS = []
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+MINIO_ENDPOINT_URL = '127.0.0.1:9000'
+MINIO_ACCESS_KEY = 'minio'
+MINIO_SECRET_KEY = 'minio124'
+MINIO_SECURE = False
+MINIO_BUCKET_NAME = 'server-soft-logos'
