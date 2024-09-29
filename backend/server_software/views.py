@@ -1,19 +1,19 @@
 import os
+
 from datetime import datetime
+from dateutil.parser import parse
 
 from rest_framework.decorators import api_view
 from rest_framework.response import *
 from rest_framework import status
 from django.db.models import Q
-from dateutil.parser import parse
 from django.contrib.auth.models import User
 
 from settings import settings
-from settings.settings import MINIO_BUCKET_NAME, MINIO_ENDPOINT_URL, MINIO_SECURE
 from .minio import MinioStorage
 from .models import Software, InstallSoftwareRequest, SoftwareInRequest
-from server_software.serializers import InstallSoftwareRequestSerializer, SoftwareInRequestSerializer, \
-    SoftwareSerializer
+from server_software.serializers import InstallSoftwareRequestSerializer, \
+    SoftwareInRequestSerializer, SoftwareSerializer
 
 SINGLETON_USER = User(id=1, username="admin")
 SINGLETON_MANAGER = User(id=2, username="manager")
@@ -22,7 +22,7 @@ SINGLETON_MANAGER = User(id=2, username="manager")
 # Software
 
 @api_view(['GET'])
-def GetSoftwareList(request):
+def get_software_list(request):
     """
     Получение списка ПО
     """
@@ -41,7 +41,7 @@ def GetSoftwareList(request):
 
 
 @api_view(['POST'])
-def PostSoftware(request):
+def post_software(request):
     """
     Добавление ПО
     """
@@ -55,7 +55,7 @@ def PostSoftware(request):
 
 
 @api_view(['POST'])
-def PostSoftwareImage(request, pk):
+def post_software_image(request, pk):
     """
     Загрузка изображения ПО в Minio
     """
@@ -80,13 +80,13 @@ def PostSoftwareImage(request, pk):
     except Exception as e:
         return Response(f"Failed to load image: {e}", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    software.logo_file_path = f"http://{MINIO_ENDPOINT_URL}/{MINIO_BUCKET_NAME}/{file_name}"
+    software.logo_file_path = f"http://{settings.MINIO_ENDPOINT_URL}/{settings.MINIO_BUCKET_NAME}/{file_name}"
     software.save()
     return Response(status=status.HTTP_200_OK)
 
 
 @api_view(['GET'])
-def GetSoftware(request, pk):
+def get_software(request, pk):
     """
     Получение ПО
     """
@@ -98,7 +98,7 @@ def GetSoftware(request, pk):
 
 
 @api_view(['DELETE'])
-def DeleteSoftware(request, pk):
+def delete_software(request, pk):
     """
     Удаление ПО
     """
@@ -113,7 +113,7 @@ def DeleteSoftware(request, pk):
 
 
 @api_view(['PUT'])
-def PutSoftware(request, pk):
+def put_software(request, pk):
     """
     Изменение ПО
     """
@@ -132,7 +132,7 @@ def PutSoftware(request, pk):
 
 
 @api_view(['POST'])
-def PostSoftwareToRequest(request, pk):
+def post_software_to_request(request, pk):
     """
     Добавление ПО в заявку на установку
     """
@@ -171,7 +171,7 @@ def add_item_to_request(request_id: int, software_id: int):
 # InstallSoftwareRequest
 
 @api_view(['GET'])
-def GetInstallSoftwareRequests(request):
+def get_install_software_requests(request):
     """
     Получение списка заявок на установку ПО
     """
@@ -194,7 +194,7 @@ def GetInstallSoftwareRequests(request):
 
 
 @api_view(['GET'])
-def GetInstallSoftwareRequest(request, pk):
+def get_install_software_request(request, pk):
     """
     Получение заявки на установку ПО
     """
@@ -202,7 +202,7 @@ def GetInstallSoftwareRequest(request, pk):
 
 
 @api_view(['PUT'])
-def PutInstallSoftwareRequest(request, pk):
+def put_install_software_request(request, pk):
     """
     Изменение заявки на установку ПО
     """
@@ -225,7 +225,7 @@ def PutInstallSoftwareRequest(request, pk):
 
 
 @api_view(['PUT'])
-def FormInstallSoftwareRequest(request, pk):
+def form_install_software_request(request, pk):
     """
     Формирование заявки на установку ПО
     """
@@ -245,7 +245,7 @@ def FormInstallSoftwareRequest(request, pk):
 
 
 @api_view(['PUT'])
-def ResolveInstallSoftwareRequest(request, pk):
+def resolve_install_software_request(request, pk):
     """
     Закрытие заявки на установку ПО модератором
     """
@@ -282,7 +282,7 @@ def calculate_total_installing_time_for_req(pk):
 
 
 @api_view(['DELETE'])
-def DeleteInstallSoftwareRequest(request, pk):
+def delete_install_software_request(request, pk):
     """
     Удаление заявки на установку ПО
     """
@@ -297,7 +297,7 @@ def DeleteInstallSoftwareRequest(request, pk):
 
 
 @api_view(['PUT'])
-def PutSoftwareInRequest(request, pk):
+def put_software_in_request(request, pk):
     """
     Изменение данных о ПО в заявке
     """
@@ -315,7 +315,7 @@ def PutSoftwareInRequest(request, pk):
 
 
 @api_view(['DELETE'])
-def DeleteSoftwareInRequest(request, pk):
+def delete_software_in_request(request, pk):
     """
     Удаление ПО из заявки
     """

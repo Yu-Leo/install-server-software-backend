@@ -25,30 +25,29 @@ urlpatterns = [
 
     # Software
 
-    path('software', views.GetSoftwareList, name='software_list'),
-    path('software/post', views.PostSoftware, name='software_post'),
-    path('software/<int:pk>', views.GetSoftware, name='software'),
-    path('software/<int:pk>/delete', views.DeleteSoftware, name='software_delete'),
-    path('software/<int:pk>/put', views.PutSoftware, name='software_put'),
-    path('software/<int:pk>/add', views.PostSoftwareToRequest, name='software_add'),
-    path('software/<int:pk>/add_image', views.PostSoftwareImage, name='software_add_image'),
+    path('software', views.get_software_list, name='software_list'),
+    path('software/post', views.post_software, name='software_post'),
+    path('software/<int:pk>', views.get_software, name='software'),
+    path('software/<int:pk>/delete', views.delete_software, name='software_delete'),
+    path('software/<int:pk>/put', views.put_software, name='software_put'),
+    path('software/<int:pk>/add', views.post_software_to_request, name='software_add'),
+    path('software/<int:pk>/add_image', views.post_software_image, name='software_add_image'),
 
     # InstallSoftwareRequest
 
-    path('install_software_requests', views.GetInstallSoftwareRequests, name='install_software_requests'),
-    path('install_software_requests/<int:pk>', views.GetInstallSoftwareRequest, name='install_software_request'),
-    path('install_software_requests/<int:pk>/put', views.PutInstallSoftwareRequest,
+    path('install_software_requests', views.get_install_software_requests, name='install_software_requests'),
+    path('install_software_requests/<int:pk>', views.get_install_software_request, name='install_software_request'),
+    path('install_software_requests/<int:pk>/put', views.put_install_software_request,
          name='install_software_request_put'),
-    path('install_software_requests/<int:pk>/form', views.FormInstallSoftwareRequest,
+    path('install_software_requests/<int:pk>/form', views.form_install_software_request,
          name='install_software_request_form'),
-    path('install_software_requests/<int:pk>/resolve', views.ResolveInstallSoftwareRequest,
+    path('install_software_requests/<int:pk>/resolve', views.resolve_install_software_request,
          name='install_software_request_resolve'),
-    path('install_software_requests/<int:pk>/delete', views.DeleteInstallSoftwareRequest,
+    path('install_software_requests/<int:pk>/delete', views.delete_install_software_request,
          name='install_software_request_delete'),
 
     # SoftwareInRequest
 
-    path('software_in_request/<int:pk>/put', views.PutSoftwareInRequest, name='software_in_request_put'),
-    path('software_in_request/<int:pk>/delete', views.DeleteSoftwareInRequest, name='software_in_request_delete'),
-
+    path('software_in_request/<int:pk>/put', views.put_software_in_request, name='software_in_request_put'),
+    path('software_in_request/<int:pk>/delete', views.delete_software_in_request, name='software_in_request_delete'),
 ]
