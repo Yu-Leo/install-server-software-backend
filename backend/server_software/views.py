@@ -207,7 +207,13 @@ def get_install_software_request(request, pk):
     """
     Получение заявки на установку ПО
     """
-    return Response("Not implemented", status=501)  # TODO
+    filters = Q(id=pk) & ~Q(status=InstallSoftwareRequest.RequestStatus.DELETED)
+    install_software_request = InstallSoftwareRequest.objects.filter(filters).first()
+    if install_software_request is None:
+        return Response("InstallSoftwareRequest not found", status=status.HTTP_404_NOT_FOUND)
+
+    serializer = FullInstallSoftwareRequestSerializer(install_software_request)
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 @api_view(['PUT'])
