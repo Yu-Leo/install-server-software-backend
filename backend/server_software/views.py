@@ -135,8 +135,6 @@ def put_software(request, pk):
     serializer = SoftwareSerializer(software, data=request.data, partial=True)
     if serializer.is_valid():
         serializer.save()
-        software = Software.objects.get(id=pk)
-        serializer = SoftwareSerializer(software)
         return Response(serializer.data)
     else:
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -227,8 +225,6 @@ def put_install_software_request(request, pk):
                                                      partial=True)
     if serializer.is_valid():
         serializer.save()
-        install_software_request = InstallSoftwareRequest.objects.get(id=pk)
-        serializer = InstallSoftwareRequestSerializer(install_software_request)
         return Response(serializer.data)
     else:
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -330,8 +326,6 @@ def put_software_in_request(request, pk):
     serializer = SoftwareInRequestSerializer(software_in_request, data=request.data, partial=True)
     if serializer.is_valid():
         serializer.save()
-        software_in_request = SoftwareInRequest.objects.get(id=pk)
-        serializer = SoftwareInRequestSerializer(software_in_request)
         return Response(serializer.data)
     else:
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
