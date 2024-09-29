@@ -16,6 +16,26 @@ class InstallSoftwareRequestSerializer(serializers.ModelSerializer):
         fields = ["pk", "creation_datetime", "formation_datetime", "completion_datetime", "host", "client", "manager",
                   "total_installing_time_in_min", "status"]
 
+class PutInstallSoftwareRequestSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = InstallSoftwareRequest
+        fields = ["pk", "creation_datetime", "formation_datetime", "completion_datetime", "host", "client", "manager",
+                   "total_installing_time_in_min", "status"]
+        read_only_fields = ["pk", "creation_datetime", "formation_datetime", "completion_datetime", "client", "manager",
+                  "total_installing_time_in_min", "status"]
+
+class ResolveInstallSoftwareRequestSerializer(serializers.ModelSerializer):
+    def validate(self, data):
+        if data.get('status', '') not in (InstallSoftwareRequest.RequestStatus.COMPLETED, InstallSoftwareRequest.RequestStatus.REJECTED, ):
+            raise serializers.ValidationError("invalid status")
+        return data
+
+    class Meta:
+        model = InstallSoftwareRequest
+        fields = ["pk", "creation_datetime", "formation_datetime", "completion_datetime", "host", "client", "manager",
+                  "total_installing_time_in_min", "status"]
+        read_only_fields = ["pk", "creation_datetime", "formation_datetime", "completion_datetime", "host", "client", "manager",
+                  "total_installing_time_in_min"]
 
 class SoftwareInRequestSerializer(serializers.ModelSerializer):
     class Meta:

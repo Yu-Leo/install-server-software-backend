@@ -11,9 +11,7 @@ from django.contrib.auth.models import User
 
 from settings import settings
 from .minio import MinioStorage
-from .models import Software, InstallSoftwareRequest, SoftwareInRequest
-from server_software.serializers import InstallSoftwareRequestSerializer, \
-    SoftwareInRequestSerializer, SoftwareSerializer
+from server_software.serializers import *
 
 SINGLETON_USER = User(id=1, username="admin")
 SINGLETON_MANAGER = User(id=2, username="manager")
@@ -224,10 +222,9 @@ def put_install_software_request(request, pk):
     if install_software_request is None:
         return Response("InstallSoftwareRequest not found", status=status.HTTP_404_NOT_FOUND)
 
-    # TODO: проверять, что можем поменять только host
-    serializer = InstallSoftwareRequestSerializer(install_software_request,
-                                                  data=request.data,
-                                                  partial=True)
+    serializer = PutInstallSoftwareRequestSerializer(install_software_request,
+                                                     data=request.data,
+                                                     partial=True)
     if serializer.is_valid():
         serializer.save()
         install_software_request = InstallSoftwareRequest.objects.get(id=pk)
@@ -250,11 +247,25 @@ def form_install_software_request(request, pk):
     if install_software_request.host is None or install_software_request.host == "":
         return Response("InstallSoftwareRequest.host is empty", status=status.HTTP_400_BAD_REQUEST)
 
+    if not is_valid_versions(pk):
+        return Response("One or more software versions is empty", status=status.HTTP_400_BAD_REQUEST)
+
     install_software_request.status = InstallSoftwareRequest.RequestStatus.FORMED
     install_software_request.formation_datetime = datetime.now()
     install_software_request.save()
     serializer = InstallSoftwareRequestSerializer(install_software_request)
     return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+def is_valid_versions(request_id):
+    """
+    Проверка: у всего ПО из заявки должна быть указана версия
+    """
+    software_in_request = SoftwareInRequest.objects.filter(request_id=request_id)
+    for software in software_in_request:
+        if software.version is None or software.version == "":
+            return False
+    return True
 
 
 @api_view(['PUT'])
@@ -267,16 +278,15 @@ def resolve_install_software_request(request, pk):
     if install_software_request is None:
         return Response("InstallSoftwareRequest not found", status=status.HTTP_404_NOT_FOUND)
 
-    # TODO: проверять, что можем поменять только status на COMPLETED или REJECTED
-    serializer = InstallSoftwareRequestSerializer(install_software_request,
-                                                  data=request.data,
-                                                  partial=True)
+    serializer = ResolveInstallSoftwareRequestSerializer(install_software_request,
+                                                         data=request.data,
+                                                         partial=True)
     if not serializer.is_valid():
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     serializer.save()
-    install_software_request = InstallSoftwareRequest.objects.get(id=pk)
 
+    install_software_request = InstallSoftwareRequest.objects.get(id=pk)
     install_software_request.completion_datetime = datetime.now()
     install_software_request.total_installing_time_in_min = calculate_total_installing_time_for_req(pk)
     install_software_request.SINGLETON_MANAGER = SINGLETON_MANAGER
