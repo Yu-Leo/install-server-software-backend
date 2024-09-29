@@ -60,7 +60,7 @@ class RelatedSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SoftwareInRequest
-        fields = ["software", "version"]
+        fields = ["pk", "software", "version"]
 
 
 class FullInstallSoftwareRequestSerializer(serializers.ModelSerializer):
