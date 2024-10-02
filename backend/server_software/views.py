@@ -27,15 +27,20 @@ def get_software_list(request):
     Получение списка ПО
     """
     software_title = request.query_params.get("software_title", "")
+    software_list = Software.objects.filter(title__istartswith=software_title, is_active=True)
+
     req = InstallSoftwareRequest.objects.filter(client_id=SINGLETON_USER.id,
                                                 status=InstallSoftwareRequest.RequestStatus.DRAFT).first()
-    software_list = Software.objects.filter(title__istartswith=software_title, is_active=True)
+    items_in_cart = 0
+    if req is not None:
+        items_in_cart = SoftwareInRequest.objects.filter(request_id=req.id).count()
 
     serializer = SoftwareSerializer(software_list, many=True)
     return Response(
         {
             "software": serializer.data,
-            "install_software_request_id": req.id if req else None
+            "install_software_request_id": req.id if req else None,
+            "items_in_cart": items_in_cart,
         },
         status=status.HTTP_200_OK)
 
