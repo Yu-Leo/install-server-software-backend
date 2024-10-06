@@ -11,6 +11,8 @@ from django.contrib.auth import authenticate
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 
 from settings import settings
 from .minio import MinioStorage
@@ -21,8 +23,19 @@ SINGLETON_MANAGER = User(id=2, username="manager")
 
 session_storage = redis.StrictRedis(host=settings.REDIS_HOST, port=settings.REDIS_PORT)
 
+
 # Software
 
+@swagger_auto_schema(method='get', responses={
+    status.HTTP_200_OK: openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties={
+            'software': openapi.Schema(type=openapi.TYPE_ARRAY, items=openapi.Schema(type=openapi.TYPE_OBJECT)),
+            'install_software_request_id': openapi.Schema(type=openapi.TYPE_NUMBER),
+            'items_in_cart': openapi.Schema(type=openapi.TYPE_NUMBER),
+        }
+    ),
+})
 @api_view(['GET'])
 def get_software_list(request):
     """
@@ -47,6 +60,12 @@ def get_software_list(request):
         status=status.HTTP_200_OK)
 
 
+@swagger_auto_schema(method='post',
+                     request_body=SoftwareSerializer,
+                     responses={
+                         status.HTTP_200_OK: SoftwareSerializer(),
+                         status.HTTP_400_BAD_REQUEST: "Bad Request",
+                     })
 @api_view(['POST'])
 def post_software(request):
     """
@@ -61,6 +80,16 @@ def post_software(request):
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+@swagger_auto_schema(method="post",
+                     manual_parameters=[
+                         openapi.Parameter(name="image",
+                                           in_=openapi.IN_QUERY,
+                                           type=openapi.TYPE_FILE,
+                                           required=True, description="Image")],
+                     responses={
+                         status.HTTP_200_OK: "OK",
+                         status.HTTP_400_BAD_REQUEST: "Bad Request",
+                     })
 @api_view(['POST'])
 def post_software_image(request, pk):
     """
@@ -92,6 +121,11 @@ def post_software_image(request, pk):
     return Response(status=status.HTTP_200_OK)
 
 
+@swagger_auto_schema(method='get',
+                     responses={
+                         status.HTTP_200_OK: SoftwareSerializer(),
+                         status.HTTP_404_NOT_FOUND: "Not Found",
+                     })
 @api_view(['GET'])
 def get_software(request, pk):
     """
@@ -104,6 +138,11 @@ def get_software(request, pk):
     return Response(serialized_software.data, status=status.HTTP_200_OK)
 
 
+@swagger_auto_schema(method='delete',
+                     responses={
+                         status.HTTP_200_OK: "OK",
+                         status.HTTP_404_NOT_FOUND: "Not Found",
+                     })
 @api_view(['DELETE'])
 def delete_software(request, pk):
     """
@@ -132,6 +171,13 @@ def delete_software(request, pk):
     return Response(status=status.HTTP_200_OK)
 
 
+@swagger_auto_schema(method='put',
+                     request_body=SoftwareSerializer,
+                     responses={
+                         status.HTTP_200_OK: SoftwareSerializer(),
+                         status.HTTP_400_BAD_REQUEST: "Bad Request",
+                         status.HTTP_404_NOT_FOUND: "Not Found",
+                     })
 @api_view(['PUT'])
 def put_software(request, pk):
     """
@@ -149,6 +195,11 @@ def put_software(request, pk):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+@swagger_auto_schema(method='post',
+                     responses={
+                         status.HTTP_200_OK: "OK",
+                         status.HTTP_404_NOT_FOUND: "Not Found",
+                     })
 @api_view(['POST'])
 def post_software_to_request(request, pk):
     """
@@ -188,6 +239,10 @@ def add_item_to_request(request_id: int, software_id: int):
 
 # InstallSoftwareRequest
 
+@swagger_auto_schema(method='get',
+                     responses={
+                         status.HTTP_200_OK: SoftwareSerializer(many=True),
+                     })
 @api_view(['GET'])
 def get_install_software_requests(request):
     """
@@ -211,6 +266,11 @@ def get_install_software_requests(request):
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+@swagger_auto_schema(method='get',
+                     responses={
+                         status.HTTP_200_OK: FullInstallSoftwareRequestSerializer(),
+                         status.HTTP_404_NOT_FOUND: "Not Found",
+                     })
 @api_view(['GET'])
 def get_install_software_request(request, pk):
     """
@@ -225,6 +285,13 @@ def get_install_software_request(request, pk):
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+@swagger_auto_schema(method='put',
+                     request_body=PutInstallSoftwareRequestSerializer,
+                     responses={
+                         status.HTTP_200_OK: PutInstallSoftwareRequestSerializer(),
+                         status.HTTP_400_BAD_REQUEST: "Bad Request",
+                         status.HTTP_404_NOT_FOUND: "Not Found",
+                     })
 @api_view(['PUT'])
 def put_install_software_request(request, pk):
     """
@@ -245,6 +312,12 @@ def put_install_software_request(request, pk):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+@swagger_auto_schema(method='put',
+                     responses={
+                         status.HTTP_200_OK: InstallSoftwareRequestSerializer(),
+                         status.HTTP_400_BAD_REQUEST: "Bad Request",
+                         status.HTTP_404_NOT_FOUND: "Not Found",
+                     })
 @api_view(['PUT'])
 def form_install_software_request(request, pk):
     """
@@ -279,6 +352,11 @@ def is_valid_versions(request_id):
     return True
 
 
+@swagger_auto_schema(method='put',
+                     responses={
+                         status.HTTP_200_OK: InstallSoftwareRequestSerializer(),
+                         status.HTTP_404_NOT_FOUND: "Not Found",
+                     })
 @api_view(['PUT'])
 def resolve_install_software_request(request, pk):
     """
@@ -315,6 +393,11 @@ def calculate_total_installing_time_for_req(pk):
     return sum([s.software.installing_time_in_mins for s in soft])
 
 
+@swagger_auto_schema(method='delete',
+                     responses={
+                         status.HTTP_200_OK: "OK",
+                         status.HTTP_404_NOT_FOUND: "Not Found",
+                     })
 @api_view(['DELETE'])
 def delete_install_software_request(request, pk):
     """
@@ -330,6 +413,13 @@ def delete_install_software_request(request, pk):
     return Response(status=status.HTTP_200_OK)
 
 
+@swagger_auto_schema(method='put',
+                     request_body=SoftwareInRequestSerializer,
+                     responses={
+                         status.HTTP_200_OK: SoftwareInRequestSerializer(),
+                         status.HTTP_400_BAD_REQUEST: "Bad Request",
+                         status.HTTP_404_NOT_FOUND: "Not Found",
+                     })
 @api_view(['PUT'])
 def put_software_in_request(request, request_pk, software_pk):
     """
@@ -346,6 +436,11 @@ def put_software_in_request(request, request_pk, software_pk):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+@swagger_auto_schema(method='delete',
+                     responses={
+                         status.HTTP_200_OK: "OK",
+                         status.HTTP_404_NOT_FOUND: "Not Found",
+                     })
 @api_view(['DELETE'])
 def delete_software_in_request(request, request_pk, software_pk):
     """
@@ -360,6 +455,12 @@ def delete_software_in_request(request, request_pk, software_pk):
 
 # User
 
+@swagger_auto_schema(method='post',
+                     request_body=UserSerializer,
+                     responses={
+                         status.HTTP_200_OK: "OK",
+                         status.HTTP_400_BAD_REQUEST: "Bad Request",
+                     })
 @api_view(['POST'])
 def create_user(request):
     """
@@ -372,6 +473,11 @@ def create_user(request):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+@swagger_auto_schema(method='post',
+                     responses={
+                         status.HTTP_200_OK: "OK",
+                         status.HTTP_400_BAD_REQUEST: "Bad Request",
+                     })
 @api_view(['POST'])
 def login_user(request):
     """
@@ -386,6 +492,10 @@ def login_user(request):
     return Response({'error': 'Invalid Credentials'}, status=status.HTTP_400_BAD_REQUEST)
 
 
+@swagger_auto_schema(method='post',
+                     responses={
+                         status.HTTP_204_NO_CONTENT: "No content",
+                     })
 @api_view(['POST'])
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
@@ -397,6 +507,12 @@ def logout_user(request):
     return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+@swagger_auto_schema(method='put',
+                     request_body=UserSerializer,
+                     responses={
+                         status.HTTP_200_OK: UserSerializer(),
+                         status.HTTP_400_BAD_REQUEST: "Bad Request",
+                     })
 @api_view(['PUT'])
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
