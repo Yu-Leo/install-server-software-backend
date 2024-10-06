@@ -203,7 +203,7 @@ def get_install_software_requests(request):
     if formation_datetime_end_filter is not None:
         filters &= Q(formation_datetime__lte=parse(formation_datetime_end_filter))
 
-    install_software_requests = InstallSoftwareRequest.objects.filter(filters)
+    install_software_requests = InstallSoftwareRequest.objects.filter(filters).select_related("client")
     serializer = InstallSoftwareRequestSerializer(install_software_requests, many=True)
 
     return Response(serializer.data, status=status.HTTP_200_OK)

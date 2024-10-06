@@ -11,11 +11,19 @@ class SoftwareSerializer(serializers.ModelSerializer):
                   "is_active", "logo_file_path"]
 
 
+class ClientSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["id", "username"]
+
+
 class InstallSoftwareRequestSerializer(serializers.ModelSerializer):
+    client = ClientSerializer()
+
     class Meta:
         model = InstallSoftwareRequest
-        fields = ["pk", "creation_datetime", "formation_datetime", "completion_datetime", "host", "client", "manager",
-                  "total_installing_time_in_min", "status"]
+        fields = ["pk", "creation_datetime", "formation_datetime", "completion_datetime", "host", "manager",
+                  "total_installing_time_in_min", "status", "client"]
 
 
 class PutInstallSoftwareRequestSerializer(serializers.ModelSerializer):
