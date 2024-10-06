@@ -1,8 +1,6 @@
 import os
 import uuid
 
-import redis
-
 from datetime import datetime
 from dateutil.parser import parse
 from django.db.models import Q
@@ -10,17 +8,15 @@ from rest_framework.decorators import api_view, permission_classes, authenticati
 from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth import authenticate
-from rest_framework.authtoken.models import Token
-from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import AllowAny
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
-from rest_framework.parsers import FormParser, MultiPartParser
+from rest_framework.parsers import FormParser
 
 from settings import settings
 from .minio import MinioStorage
 from server_software.serializers import *
-from .auth import AuthenticationBySessionID, IsAuth
+from .auth import AuthBySessionID, AuthBySessionIDIfExists, IsAuth
 from .redis import session_storage
 
 SINGLETON_USER = User(id=1, username="admin")
@@ -29,7 +25,6 @@ SINGLETON_MANAGER = User(id=2, username="manager")
 
 # Software
 
-# TODO: права
 @swagger_auto_schema(method='get', responses={
     status.HTTP_200_OK: openapi.Schema(
         type=openapi.TYPE_OBJECT,
@@ -39,20 +34,27 @@ SINGLETON_MANAGER = User(id=2, username="manager")
             'items_in_cart': openapi.Schema(type=openapi.TYPE_NUMBER),
         }
     ),
+    status.HTTP_403_FORBIDDEN: "Forbidden",
 })
 @api_view(['GET'])
+@permission_classes([AllowAny])
+@authentication_classes([AuthBySessionIDIfExists])
 def get_software_list(request):
     """
     Получение списка ПО
     """
+    user = request.user
     software_title = request.query_params.get("software_title", "")
     software_list = Software.objects.filter(title__istartswith=software_title, is_active=True)
 
-    req = InstallSoftwareRequest.objects.filter(client_id=SINGLETON_USER.id,
-                                                status=InstallSoftwareRequest.RequestStatus.DRAFT).first()
+    req = None
     items_in_cart = 0
-    if req is not None:
-        items_in_cart = SoftwareInRequest.objects.filter(request_id=req.id).count()
+
+    if user is not None:
+        req = InstallSoftwareRequest.objects.filter(client_id=user.pk,
+                                                    status=InstallSoftwareRequest.RequestStatus.DRAFT).first()
+        if req is not None:
+            items_in_cart = SoftwareInRequest.objects.filter(request_id=req.id).count()
 
     serializer = SoftwareSerializer(software_list, many=True)
     return Response(
@@ -473,7 +475,6 @@ def delete_software_in_request(request, request_pk, software_pk):
 
 # User
 
-@permission_classes([AllowAny])
 @swagger_auto_schema(method='post',
                      request_body=UserSerializer,
                      responses={
@@ -481,6 +482,7 @@ def delete_software_in_request(request, request_pk, software_pk):
                          status.HTTP_400_BAD_REQUEST: "Bad Request",
                      })
 @api_view(['POST'])
+@permission_classes([AllowAny])
 def create_user(request):
     """
     Создание пользователя
@@ -557,7 +559,7 @@ def logout_user(request):
                      })
 @api_view(['PUT'])
 @permission_classes([IsAuth])
-@authentication_classes([AuthenticationBySessionID])
+@authentication_classes([AuthBySessionID])
 def update_user(request):
     """
     Обновление данных пользователя

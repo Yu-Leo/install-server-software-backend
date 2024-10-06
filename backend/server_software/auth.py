@@ -7,7 +7,7 @@ from rest_framework import authentication
 from rest_framework import exceptions
 
 
-class AuthenticationBySessionID(authentication.BaseAuthentication):
+class AuthBySessionID(authentication.BaseAuthentication):
     def authenticate(self, request):
         session_id = request.COOKIES["session_id"]
         if session_id is None:
@@ -22,6 +22,21 @@ class AuthenticationBySessionID(authentication.BaseAuthentication):
         if user is None:
             raise exceptions.AuthenticationFailed('No such user')
 
+        return user, None
+
+
+class AuthBySessionIDIfExists(authentication.BaseAuthentication):
+    def authenticate(self, request):
+        session_id = request.COOKIES["session_id"]
+        if session_id is None:
+            return None, None
+
+        try:
+            username = session_storage.get(session_id).decode('utf-8')
+        except Exception as e:
+            return None, None
+
+        user = User.objects.get(username=username)
         return user, None
 
 
