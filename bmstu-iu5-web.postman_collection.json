@@ -12,7 +12,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8000/software?software_title=da",
+					"raw": "http://localhost:8000/software?software_title=d",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -24,7 +24,7 @@
 					"query": [
 						{
 							"key": "software_title",
-							"value": "da"
+							"value": "d"
 						}
 					]
 				}
@@ -38,7 +38,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"title\": \"Some\",\n    \"price\": 123,\n    \"installing_time_in_mins\": 12,\n    \"size_in_bytes\": 10,\n    \"summary\": \"summary\",\n    \"description\": \"description\"\n}",
+					"raw": "{\n    \"title\": \"Some software 2\",\n    \"price\": 123,\n    \"installing_time_in_mins\": 12,\n    \"size_in_bytes\": 10,\n    \"summary\": \"summary\",\n    \"description\": \"description\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -137,7 +137,7 @@
 				"method": "POST",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8000/software/13/add",
+					"raw": "http://localhost:8000/software/14/add",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -145,7 +145,7 @@
 					"port": "8000",
 					"path": [
 						"software",
-						"13",
+						"14",
 						"add"
 					]
 				}
@@ -163,12 +163,12 @@
 						{
 							"key": "image",
 							"type": "file",
-							"src": "/home/leo/BMSTU/semester05/RIP/lab01-logos/logo-docker.png"
+							"src": "/home/leo/BMSTU/semester05/RIP/logos/logo-docker.png"
 						}
 					]
 				},
 				"url": {
-					"raw": "http://localhost:8000/software/16/add_image?image",
+					"raw": "http://localhost:8000/software/17/add_image?image",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -176,7 +176,7 @@
 					"port": "8000",
 					"path": [
 						"software",
-						"16",
+						"17",
 						"add_image"
 					],
 					"query": [
@@ -195,7 +195,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8000/install_software_requests?status=formed&formation_start=2024-08-10&formation_end=2024-09-15T10:00:00",
+					"raw": "http://localhost:8000/install_software_requests",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -207,15 +207,18 @@
 					"query": [
 						{
 							"key": "status",
-							"value": "formed"
+							"value": "draft",
+							"disabled": true
 						},
 						{
 							"key": "formation_start",
-							"value": "2024-08-10"
+							"value": "2024-08-10",
+							"disabled": true
 						},
 						{
 							"key": "formation_end",
-							"value": "2024-09-15T10:00:00"
+							"value": "2024-09-15T10:00:00",
+							"disabled": true
 						}
 					]
 				}
@@ -228,7 +231,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8000/install_software_requests/41",
+					"raw": "http://localhost:8000/install_software_requests/44",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -236,7 +239,7 @@
 					"port": "8000",
 					"path": [
 						"install_software_requests",
-						"41"
+						"44"
 					]
 				}
 			},
@@ -249,7 +252,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"status\": \"COMPLETED\",\n    \"host\": \"1234\"\n}",
+					"raw": "{\n    \"host\": \"123.10.10.23\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -257,7 +260,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8000/install_software_requests/41/put",
+					"raw": "http://localhost:8000/install_software_requests/43/put",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -265,7 +268,7 @@
 					"port": "8000",
 					"path": [
 						"install_software_requests",
-						"41",
+						"43",
 						"put"
 					]
 				}
@@ -278,7 +281,7 @@
 				"method": "PUT",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8000/install_software_requests/41/form",
+					"raw": "http://localhost:8000/install_software_requests/43/form",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -286,7 +289,7 @@
 					"port": "8000",
 					"path": [
 						"install_software_requests",
-						"41",
+						"43",
 						"form"
 					]
 				}
@@ -300,7 +303,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"status\": \"COMPLETED\",\n    \"host\": \"123\"\n}",
+					"raw": "{\n    \"status\": \"COMPLETED\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -308,7 +311,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8000/install_software_requests/41/resolve",
+					"raw": "http://localhost:8000/install_software_requests/43/resolve",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -316,7 +319,7 @@
 					"port": "8000",
 					"path": [
 						"install_software_requests",
-						"41",
+						"43",
 						"resolve"
 					]
 				}
@@ -329,7 +332,7 @@
 				"method": "DELETE",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8000/install_software_requests/40/delete",
+					"raw": "http://localhost:8000/install_software_requests/41/delete",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -337,7 +340,7 @@
 					"port": "8000",
 					"path": [
 						"install_software_requests",
-						"40",
+						"41",
 						"delete"
 					]
 				}
@@ -359,7 +362,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8000/software_in_request/61/put",
+					"raw": "http://localhost:8000/software_in_request/44/13/put",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -367,7 +370,8 @@
 					"port": "8000",
 					"path": [
 						"software_in_request",
-						"61",
+						"44",
+						"13",
 						"put"
 					]
 				}
@@ -380,7 +384,7 @@
 				"method": "DELETE",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8000/software_in_request/57/delete",
+					"raw": "http://localhost:8000/software_in_request/44/13/delete",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -388,7 +392,8 @@
 					"port": "8000",
 					"path": [
 						"software_in_request",
-						"57",
+						"44",
+						"13",
 						"delete"
 					]
 				}
@@ -402,7 +407,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"username\": \"test\",\n    \"password\": \"12345678\"\n}",
+					"raw": "{\n    \"username\": \"test_user\",\n    \"password\": \"12345678\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
