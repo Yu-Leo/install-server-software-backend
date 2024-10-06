@@ -66,4 +66,4 @@ class IsManagerAuth(permissions.BasePermission):
         if user is None:
             return False
 
-        return bool(user.is_staff or user.is_superuser)
+        return user.is_staff

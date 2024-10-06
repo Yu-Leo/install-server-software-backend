@@ -21,9 +21,6 @@ from .redis import session_storage
 from .services import get_or_create_user_cart, is_valid_versions, \
     calculate_total_installing_time_for_req, add_item_to_request
 
-SINGLETON_USER = User(id=1, username="admin")
-SINGLETON_MANAGER = User(id=2, username="manager")
-
 
 # Software
 
@@ -275,7 +272,7 @@ def get_install_software_requests(request):
     if formation_datetime_end_filter is not None:
         filters &= Q(formation_datetime__lte=parse(formation_datetime_end_filter))
 
-    if not (request.user.is_staff or request.user.is_superuser):
+    if not request.user.is_staff:
         filters &= Q(client=request.user)
 
     install_software_requests = InstallSoftwareRequest.objects.filter(filters).select_related("client")
@@ -284,35 +281,43 @@ def get_install_software_requests(request):
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-# TODO: права
 @swagger_auto_schema(method='get',
                      responses={
                          status.HTTP_200_OK: FullInstallSoftwareRequestSerializer(),
+                         status.HTTP_403_FORBIDDEN: "Forbidden",
                          status.HTTP_404_NOT_FOUND: "Not Found",
                      })
 @api_view(['GET'])
+@permission_classes([IsAuth])
+@authentication_classes([AuthBySessionID])
 def get_install_software_request(request, pk):
     """
     Получение заявки на установку ПО
     """
     filters = Q(id=pk) & ~Q(status=InstallSoftwareRequest.RequestStatus.DELETED)
+
     install_software_request = InstallSoftwareRequest.objects.filter(filters).first()
     if install_software_request is None:
         return Response("InstallSoftwareRequest not found", status=status.HTTP_404_NOT_FOUND)
+
+    if not request.user.is_staff and install_software_request.client != request.user:
+        return Response(status=status.HTTP_403_FORBIDDEN)
 
     serializer = FullInstallSoftwareRequestSerializer(install_software_request)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-# TODO: права
 @swagger_auto_schema(method='put',
                      request_body=PutInstallSoftwareRequestSerializer,
                      responses={
                          status.HTTP_200_OK: PutInstallSoftwareRequestSerializer(),
                          status.HTTP_400_BAD_REQUEST: "Bad Request",
+                         status.HTTP_403_FORBIDDEN: "Forbidden",
                          status.HTTP_404_NOT_FOUND: "Not Found",
                      })
 @api_view(['PUT'])
+@permission_classes([IsAuth])
+@authentication_classes([AuthBySessionID])
 def put_install_software_request(request, pk):
     """
     Изменение заявки на установку ПО
@@ -321,6 +326,9 @@ def put_install_software_request(request, pk):
                                                                      status=InstallSoftwareRequest.RequestStatus.DRAFT).first()
     if install_software_request is None:
         return Response("InstallSoftwareRequest not found", status=status.HTTP_404_NOT_FOUND)
+
+    if install_software_request.client != request.user:
+        return Response(status=status.HTTP_403_FORBIDDEN)
 
     serializer = PutInstallSoftwareRequestSerializer(install_software_request,
                                                      data=request.data,
@@ -332,14 +340,16 @@ def put_install_software_request(request, pk):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-# TODO: права
 @swagger_auto_schema(method='put',
                      responses={
                          status.HTTP_200_OK: InstallSoftwareRequestSerializer(),
                          status.HTTP_400_BAD_REQUEST: "Bad Request",
+                         status.HTTP_403_FORBIDDEN: "Forbidden",
                          status.HTTP_404_NOT_FOUND: "Not Found",
                      })
 @api_view(['PUT'])
+@permission_classes([IsAuth])
+@authentication_classes([AuthBySessionID])
 def form_install_software_request(request, pk):
     """
     Формирование заявки на установку ПО
@@ -348,6 +358,9 @@ def form_install_software_request(request, pk):
                                                                      status=InstallSoftwareRequest.RequestStatus.DRAFT).first()
     if install_software_request is None:
         return Response("InstallSoftwareRequest not found", status=status.HTTP_404_NOT_FOUND)
+
+    if install_software_request.client != request.user:
+        return Response(status=status.HTTP_403_FORBIDDEN)
 
     if install_software_request.host is None or install_software_request.host == "":
         return Response("InstallSoftwareRequest.host is empty", status=status.HTTP_400_BAD_REQUEST)
@@ -398,13 +411,15 @@ def resolve_install_software_request(request, pk):
     return Response(serializer.data)
 
 
-# TODO: права
 @swagger_auto_schema(method='delete',
                      responses={
                          status.HTTP_200_OK: "OK",
+                         status.HTTP_403_FORBIDDEN: "Forbidden",
                          status.HTTP_404_NOT_FOUND: "Not Found",
                      })
 @api_view(['DELETE'])
+@permission_classes([IsAuth])
+@authentication_classes([AuthBySessionID])
 def delete_install_software_request(request, pk):
     """
     Удаление заявки на установку ПО
@@ -414,24 +429,36 @@ def delete_install_software_request(request, pk):
     if install_software_request is None:
         return Response("InstallSoftwareRequest not found", status=status.HTTP_404_NOT_FOUND)
 
+    if install_software_request.client != request.user:
+        return Response(status=status.HTTP_403_FORBIDDEN)
+
     install_software_request.status = InstallSoftwareRequest.RequestStatus.DELETED
     install_software_request.save()
     return Response(status=status.HTTP_200_OK)
 
 
-# TODO: права
 @swagger_auto_schema(method='put',
                      request_body=SoftwareInRequestSerializer,
                      responses={
                          status.HTTP_200_OK: SoftwareInRequestSerializer(),
                          status.HTTP_400_BAD_REQUEST: "Bad Request",
+                         status.HTTP_403_FORBIDDEN: "Forbidden",
                          status.HTTP_404_NOT_FOUND: "Not Found",
                      })
 @api_view(['PUT'])
+@permission_classes([IsAuth])
+@authentication_classes([AuthBySessionID])
 def put_software_in_request(request, request_pk, software_pk):
     """
     Изменение данных о ПО в заявке
     """
+
+    install_software_request = InstallSoftwareRequest.objects.filter(id=request_pk).first()
+    if install_software_request is None:
+        return Response("InstallSoftwareRequest not found", status=status.HTTP_404_NOT_FOUND)
+    if install_software_request.client != request.user:
+        return Response(status=status.HTTP_403_FORBIDDEN)
+
     software_in_request = SoftwareInRequest.objects.filter(request_id=request_pk, software_id=software_pk).first()
     if software_in_request is None:
         return Response("SoftwareInRequest not found", status=status.HTTP_404_NOT_FOUND)
@@ -443,17 +470,25 @@ def put_software_in_request(request, request_pk, software_pk):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-# TODO: права
 @swagger_auto_schema(method='delete',
                      responses={
                          status.HTTP_200_OK: "OK",
+                         status.HTTP_403_FORBIDDEN: "Forbidden",
                          status.HTTP_404_NOT_FOUND: "Not Found",
                      })
 @api_view(['DELETE'])
+@permission_classes([IsAuth])
+@authentication_classes([AuthBySessionID])
 def delete_software_in_request(request, request_pk, software_pk):
     """
     Удаление ПО из заявки
     """
+    install_software_request = InstallSoftwareRequest.objects.filter(id=request_pk).first()
+    if install_software_request is None:
+        return Response("InstallSoftwareRequest not found", status=status.HTTP_404_NOT_FOUND)
+    if install_software_request.client != request.user:
+        return Response(status=status.HTTP_403_FORBIDDEN)
+
     software_in_request = SoftwareInRequest.objects.filter(request_id=request_pk, software_id=software_pk).first()
     if software_in_request is None:
         return Response("SoftwareInRequest not found", status=status.HTTP_404_NOT_FOUND)
