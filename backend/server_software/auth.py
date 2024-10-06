@@ -9,7 +9,7 @@ from rest_framework import exceptions
 
 class AuthBySessionID(authentication.BaseAuthentication):
     def authenticate(self, request):
-        session_id = request.COOKIES["session_id"]
+        session_id = request.COOKIES.get("session_id")
         if session_id is None:
             raise exceptions.AuthenticationFailed('No session_id')
 
@@ -27,7 +27,7 @@ class AuthBySessionID(authentication.BaseAuthentication):
 
 class AuthBySessionIDIfExists(authentication.BaseAuthentication):
     def authenticate(self, request):
-        session_id = request.COOKIES["session_id"]
+        session_id = request.COOKIES.get("session_id")
         if session_id is None:
             return None, None
 
@@ -42,7 +42,7 @@ class AuthBySessionIDIfExists(authentication.BaseAuthentication):
 
 class IsAuth(permissions.BasePermission):
     def has_permission(self, request, view):
-        session_id = request.COOKIES["session_id"]
+        session_id = request.COOKIES.get("session_id")
         if session_id is None:
             return False
         try:
@@ -54,7 +54,7 @@ class IsAuth(permissions.BasePermission):
 
 class IsManagerAuth(permissions.BasePermission):
     def has_permission(self, request, view):
-        session_id = request.COOKIES["session_id"]
+        session_id = request.COOKIES.get("session_id")
         if session_id is None:
             return False
         try:
