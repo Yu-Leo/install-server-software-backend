@@ -88,6 +88,12 @@ services:
     depends_on:
       - postgres
 
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    volumes:
+      - redisdata:/data
 ## By default this config uses default local driver,
 ## For custom volumes replace with volume driver configuration.
 volumes:
@@ -102,3 +108,4 @@ volumes:
 
   postgres:
   pgadmin:
+  redisdata:

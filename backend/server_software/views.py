@@ -1,4 +1,5 @@
 import os
+import redis
 
 from datetime import datetime
 from dateutil.parser import parse
@@ -18,6 +19,7 @@ from server_software.serializers import *
 SINGLETON_USER = User(id=1, username="admin")
 SINGLETON_MANAGER = User(id=2, username="manager")
 
+session_storage = redis.StrictRedis(host=settings.REDIS_HOST, port=settings.REDIS_PORT)
 
 # Software
 
