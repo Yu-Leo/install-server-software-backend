@@ -235,12 +235,30 @@ def post_software_to_request(request, pk):
 
 # InstallSoftwareRequest
 
-# TODO: права
 @swagger_auto_schema(method='get',
+                     manual_parameters=[
+                         openapi.Parameter('status',
+                                           type=openapi.TYPE_STRING,
+                                           description='status',
+                                           in_=openapi.IN_QUERY),
+                         openapi.Parameter('formation_start',
+                                           type=openapi.TYPE_STRING,
+                                           description='status',
+                                           in_=openapi.IN_QUERY,
+                                           format=openapi.FORMAT_DATETIME),
+                         openapi.Parameter('formation_end',
+                                           type=openapi.TYPE_STRING,
+                                           description='status',
+                                           in_=openapi.IN_QUERY,
+                                           format=openapi.FORMAT_DATETIME),
+                     ],
                      responses={
                          status.HTTP_200_OK: SoftwareSerializer(many=True),
+                         status.HTTP_403_FORBIDDEN: "Forbidden",
                      })
 @api_view(['GET'])
+@permission_classes([IsAuth])
+@authentication_classes([AuthBySessionID])
 def get_install_software_requests(request):
     """
     Получение списка заявок на установку ПО
@@ -256,6 +274,9 @@ def get_install_software_requests(request):
         filters &= Q(formation_datetime__gte=parse(formation_datetime_start_filter))
     if formation_datetime_end_filter is not None:
         filters &= Q(formation_datetime__lte=parse(formation_datetime_end_filter))
+
+    if not (request.user.is_staff or request.user.is_superuser):
+        filters &= Q(client=request.user)
 
     install_software_requests = InstallSoftwareRequest.objects.filter(filters).select_related("client")
     serializer = InstallSoftwareRequestSerializer(install_software_requests, many=True)
@@ -477,8 +498,7 @@ def create_user(request):
                                            description='password',
                                            in_=openapi.IN_FORM,
                                            required=True)
-                     ],
-                     )
+                     ])
 @api_view(['POST'])
 @parser_classes((FormParser,))
 @permission_classes([AllowAny])
