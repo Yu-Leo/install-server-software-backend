@@ -1,31 +1,35 @@
 import os
+import uuid
+
 import redis
 
 from datetime import datetime
 from dateutil.parser import parse
 from django.db.models import Q
-from rest_framework.decorators import api_view, permission_classes, authentication_classes
+from rest_framework.decorators import api_view, permission_classes, authentication_classes, parser_classes
 from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth import authenticate
 from rest_framework.authtoken.models import Token
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
+from rest_framework.parsers import FormParser, MultiPartParser
 
 from settings import settings
 from .minio import MinioStorage
 from server_software.serializers import *
+from .auth import AuthenticationBySessionID, IsAuth
+from .redis import session_storage
 
 SINGLETON_USER = User(id=1, username="admin")
 SINGLETON_MANAGER = User(id=2, username="manager")
 
-session_storage = redis.StrictRedis(host=settings.REDIS_HOST, port=settings.REDIS_PORT)
-
 
 # Software
 
+# TODO: права
 @swagger_auto_schema(method='get', responses={
     status.HTTP_200_OK: openapi.Schema(
         type=openapi.TYPE_OBJECT,
@@ -60,6 +64,7 @@ def get_software_list(request):
         status=status.HTTP_200_OK)
 
 
+# TODO: права
 @swagger_auto_schema(method='post',
                      request_body=SoftwareSerializer,
                      responses={
@@ -80,6 +85,7 @@ def post_software(request):
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+# TODO: права
 @swagger_auto_schema(method="post",
                      manual_parameters=[
                          openapi.Parameter(name="image",
@@ -121,6 +127,7 @@ def post_software_image(request, pk):
     return Response(status=status.HTTP_200_OK)
 
 
+# TODO: права
 @swagger_auto_schema(method='get',
                      responses={
                          status.HTTP_200_OK: SoftwareSerializer(),
@@ -138,6 +145,7 @@ def get_software(request, pk):
     return Response(serialized_software.data, status=status.HTTP_200_OK)
 
 
+# TODO: права
 @swagger_auto_schema(method='delete',
                      responses={
                          status.HTTP_200_OK: "OK",
@@ -171,6 +179,7 @@ def delete_software(request, pk):
     return Response(status=status.HTTP_200_OK)
 
 
+# TODO: права
 @swagger_auto_schema(method='put',
                      request_body=SoftwareSerializer,
                      responses={
@@ -195,6 +204,7 @@ def put_software(request, pk):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+# TODO: права
 @swagger_auto_schema(method='post',
                      responses={
                          status.HTTP_200_OK: "OK",
@@ -239,6 +249,7 @@ def add_item_to_request(request_id: int, software_id: int):
 
 # InstallSoftwareRequest
 
+# TODO: права
 @swagger_auto_schema(method='get',
                      responses={
                          status.HTTP_200_OK: SoftwareSerializer(many=True),
@@ -266,6 +277,7 @@ def get_install_software_requests(request):
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+# TODO: права
 @swagger_auto_schema(method='get',
                      responses={
                          status.HTTP_200_OK: FullInstallSoftwareRequestSerializer(),
@@ -285,6 +297,7 @@ def get_install_software_request(request, pk):
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+# TODO: права
 @swagger_auto_schema(method='put',
                      request_body=PutInstallSoftwareRequestSerializer,
                      responses={
@@ -312,6 +325,7 @@ def put_install_software_request(request, pk):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+# TODO: права
 @swagger_auto_schema(method='put',
                      responses={
                          status.HTTP_200_OK: InstallSoftwareRequestSerializer(),
@@ -352,6 +366,7 @@ def is_valid_versions(request_id):
     return True
 
 
+# TODO: права
 @swagger_auto_schema(method='put',
                      responses={
                          status.HTTP_200_OK: InstallSoftwareRequestSerializer(),
@@ -393,6 +408,7 @@ def calculate_total_installing_time_for_req(pk):
     return sum([s.software.installing_time_in_mins for s in soft])
 
 
+# TODO: права
 @swagger_auto_schema(method='delete',
                      responses={
                          status.HTTP_200_OK: "OK",
@@ -413,6 +429,7 @@ def delete_install_software_request(request, pk):
     return Response(status=status.HTTP_200_OK)
 
 
+# TODO: права
 @swagger_auto_schema(method='put',
                      request_body=SoftwareInRequestSerializer,
                      responses={
@@ -436,6 +453,7 @@ def put_software_in_request(request, request_pk, software_pk):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+# TODO: права
 @swagger_auto_schema(method='delete',
                      responses={
                          status.HTTP_200_OK: "OK",
@@ -455,10 +473,11 @@ def delete_software_in_request(request, request_pk, software_pk):
 
 # User
 
+@permission_classes([AllowAny])
 @swagger_auto_schema(method='post',
                      request_body=UserSerializer,
                      responses={
-                         status.HTTP_200_OK: "OK",
+                         status.HTTP_201_CREATED: "Created",
                          status.HTTP_400_BAD_REQUEST: "Bad Request",
                      })
 @api_view(['POST'])
@@ -477,8 +496,23 @@ def create_user(request):
                      responses={
                          status.HTTP_200_OK: "OK",
                          status.HTTP_400_BAD_REQUEST: "Bad Request",
-                     })
+                     },
+                     manual_parameters=[
+                         openapi.Parameter('username',
+                                           type=openapi.TYPE_STRING,
+                                           description='username',
+                                           in_=openapi.IN_FORM,
+                                           required=True),
+                         openapi.Parameter('password',
+                                           type=openapi.TYPE_STRING,
+                                           description='password',
+                                           in_=openapi.IN_FORM,
+                                           required=True)
+                     ],
+                     )
 @api_view(['POST'])
+@parser_classes((FormParser,))
+@permission_classes([AllowAny])
 def login_user(request):
     """
     Вход
@@ -487,24 +521,31 @@ def login_user(request):
     password = request.POST.get('password')
     user = authenticate(username=username, password=password)
     if user is not None:
-        token, created = Token.objects.get_or_create(user=user)
-        return Response({'token': token.key}, status=status.HTTP_200_OK)
+        session_id = str(uuid.uuid4())
+        session_storage.set(session_id, username)
+        response = Response(status=status.HTTP_201_CREATED)
+        response.set_cookie("session_id", session_id, samesite="lax")
+        return response
     return Response({'error': 'Invalid Credentials'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @swagger_auto_schema(method='post',
                      responses={
                          status.HTTP_204_NO_CONTENT: "No content",
+                         status.HTTP_403_FORBIDDEN: "Forbidden",
                      })
 @api_view(['POST'])
-@authentication_classes([TokenAuthentication])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsAuth])
 def logout_user(request):
     """
     Выход
     """
-    request.auth.delete()
-    return Response(status=status.HTTP_204_NO_CONTENT)
+    session_id = request.COOKIES["session_id"]
+    if session_storage.exists(session_id):
+        session_storage.delete(session_id)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    return Response(status=status.HTTP_403_FORBIDDEN)
 
 
 @swagger_auto_schema(method='put',
@@ -512,15 +553,20 @@ def logout_user(request):
                      responses={
                          status.HTTP_200_OK: UserSerializer(),
                          status.HTTP_400_BAD_REQUEST: "Bad Request",
+                         status.HTTP_403_FORBIDDEN: "Forbidden",
                      })
 @api_view(['PUT'])
-@authentication_classes([TokenAuthentication])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsAuth])
+@authentication_classes([AuthenticationBySessionID])
 def update_user(request):
     """
     Обновление данных пользователя
     """
+    print(request.user)
     user = request.user
+    if user is None:
+        return Response(status=status.HTTP_403_FORBIDDEN)
+
     serializer = UserSerializer(user, data=request.data, partial=True)
     if serializer.is_valid():
         serializer.save()
