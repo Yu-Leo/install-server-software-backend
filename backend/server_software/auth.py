@@ -50,3 +50,20 @@ class IsAuth(permissions.BasePermission):
         except Exception as e:
             return False
         return True
+
+
+class IsManagerAuth(permissions.BasePermission):
+    def has_permission(self, request, view):
+        session_id = request.COOKIES["session_id"]
+        if session_id is None:
+            return False
+        try:
+            username = session_storage.get(session_id).decode('utf-8')
+        except Exception as e:
+            return False
+
+        user = User.objects.filter(username=username).first()
+        if user is None:
+            return False
+
+        return bool(user.is_staff or user.is_superuser)

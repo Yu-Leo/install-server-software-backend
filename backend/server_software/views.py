@@ -16,8 +16,10 @@ from rest_framework.parsers import FormParser
 from settings import settings
 from .minio import MinioStorage
 from server_software.serializers import *
-from .auth import AuthBySessionID, AuthBySessionIDIfExists, IsAuth
+from .auth import AuthBySessionID, AuthBySessionIDIfExists, IsAuth, IsManagerAuth
 from .redis import session_storage
+from .services import get_or_create_user_cart, is_valid_versions, \
+    calculate_total_installing_time_for_req, add_item_to_request
 
 SINGLETON_USER = User(id=1, username="admin")
 SINGLETON_MANAGER = User(id=2, username="manager")
@@ -66,7 +68,6 @@ def get_software_list(request):
         status=status.HTTP_200_OK)
 
 
-# TODO: права
 @swagger_auto_schema(method='post',
                      request_body=SoftwareSerializer,
                      responses={
@@ -74,6 +75,7 @@ def get_software_list(request):
                          status.HTTP_400_BAD_REQUEST: "Bad Request",
                      })
 @api_view(['POST'])
+@permission_classes([IsManagerAuth])
 def post_software(request):
     """
     Добавление ПО
@@ -87,7 +89,6 @@ def post_software(request):
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-# TODO: права
 @swagger_auto_schema(method="post",
                      manual_parameters=[
                          openapi.Parameter(name="image",
@@ -99,6 +100,7 @@ def post_software(request):
                          status.HTTP_400_BAD_REQUEST: "Bad Request",
                      })
 @api_view(['POST'])
+@permission_classes([IsManagerAuth])
 def post_software_image(request, pk):
     """
     Загрузка изображения ПО в Minio
@@ -129,13 +131,13 @@ def post_software_image(request, pk):
     return Response(status=status.HTTP_200_OK)
 
 
-# TODO: права
 @swagger_auto_schema(method='get',
                      responses={
                          status.HTTP_200_OK: SoftwareSerializer(),
                          status.HTTP_404_NOT_FOUND: "Not Found",
                      })
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def get_software(request, pk):
     """
     Получение ПО
@@ -147,13 +149,13 @@ def get_software(request, pk):
     return Response(serialized_software.data, status=status.HTTP_200_OK)
 
 
-# TODO: права
 @swagger_auto_schema(method='delete',
                      responses={
                          status.HTTP_200_OK: "OK",
                          status.HTTP_404_NOT_FOUND: "Not Found",
                      })
 @api_view(['DELETE'])
+@permission_classes([IsManagerAuth])
 def delete_software(request, pk):
     """
     Удаление ПО
@@ -181,7 +183,6 @@ def delete_software(request, pk):
     return Response(status=status.HTTP_200_OK)
 
 
-# TODO: права
 @swagger_auto_schema(method='put',
                      request_body=SoftwareSerializer,
                      responses={
@@ -190,6 +191,7 @@ def delete_software(request, pk):
                          status.HTTP_404_NOT_FOUND: "Not Found",
                      })
 @api_view(['PUT'])
+@permission_classes([IsManagerAuth])
 def put_software(request, pk):
     """
     Изменение ПО
@@ -206,13 +208,14 @@ def put_software(request, pk):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-# TODO: права
 @swagger_auto_schema(method='post',
                      responses={
                          status.HTTP_200_OK: "OK",
                          status.HTTP_404_NOT_FOUND: "Not Found",
                      })
 @api_view(['POST'])
+@permission_classes([IsAuth])
+@authentication_classes([AuthBySessionID])
 def post_software_to_request(request, pk):
     """
     Добавление ПО в заявку на установку
@@ -220,33 +223,9 @@ def post_software_to_request(request, pk):
     software = Software.objects.filter(id=pk, is_active=True).first()
     if software is None:
         return Response("Software not found", status=status.HTTP_404_NOT_FOUND)
-    request_id = get_or_create_user_cart(SINGLETON_USER.id)
+    request_id = get_or_create_user_cart(request.user.id)
     add_item_to_request(request_id, pk)
     return Response(status=status.HTTP_200_OK)
-
-
-def get_or_create_user_cart(user_id: int) -> int:
-    """
-    Если у пользователя есть заявка в статусе DRAFT (корзина), возвращает её Id.
-    Если нет - создает и возвращает id созданной заявки
-    """
-    old_req = InstallSoftwareRequest.objects.filter(client_id=SINGLETON_USER.id,
-                                                    status=InstallSoftwareRequest.RequestStatus.DRAFT).first()
-    if old_req is not None:
-        return old_req.id
-
-    new_req = InstallSoftwareRequest(client_id=SINGLETON_USER.id,
-                                     status=InstallSoftwareRequest.RequestStatus.DRAFT)
-    new_req.save()
-    return new_req.id
-
-
-def add_item_to_request(request_id: int, software_id: int):
-    """
-    Добавление услуги в заявку
-    """
-    sir = SoftwareInRequest(request_id=request_id, software_id=software_id)
-    sir.save()
 
 
 # InstallSoftwareRequest
@@ -357,17 +336,6 @@ def form_install_software_request(request, pk):
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-def is_valid_versions(request_id):
-    """
-    Проверка: у всего ПО из заявки должна быть указана версия
-    """
-    software_in_request = SoftwareInRequest.objects.filter(request_id=request_id)
-    for software in software_in_request:
-        if software.version is None or software.version == "":
-            return False
-    return True
-
-
 # TODO: права
 @swagger_auto_schema(method='put',
                      responses={
@@ -400,14 +368,6 @@ def resolve_install_software_request(request, pk):
 
     serializer = InstallSoftwareRequestSerializer(install_software_request)
     return Response(serializer.data)
-
-
-def calculate_total_installing_time_for_req(pk):
-    """
-    Расчет суммарного времени на установку всего ПО из заявки
-    """
-    soft = SoftwareInRequest.objects.select_related("software").filter(request=pk)
-    return sum([s.software.installing_time_in_mins for s in soft])
 
 
 # TODO: права
@@ -564,12 +524,7 @@ def update_user(request):
     """
     Обновление данных пользователя
     """
-    print(request.user)
-    user = request.user
-    if user is None:
-        return Response(status=status.HTTP_403_FORBIDDEN)
-
-    serializer = UserSerializer(user, data=request.data, partial=True)
+    serializer = UserSerializer(request.user, data=request.data, partial=True)
     if serializer.is_valid():
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
