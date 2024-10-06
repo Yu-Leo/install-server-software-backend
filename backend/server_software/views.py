@@ -24,17 +24,25 @@ from .services import get_or_create_user_cart, is_valid_versions, \
 
 # Software
 
-@swagger_auto_schema(method='get', responses={
-    status.HTTP_200_OK: openapi.Schema(
-        type=openapi.TYPE_OBJECT,
-        properties={
-            'software': openapi.Schema(type=openapi.TYPE_ARRAY, items=openapi.Schema(type=openapi.TYPE_OBJECT)),
-            'install_software_request_id': openapi.Schema(type=openapi.TYPE_NUMBER),
-            'items_in_cart': openapi.Schema(type=openapi.TYPE_NUMBER),
-        }
-    ),
-    status.HTTP_403_FORBIDDEN: "Forbidden",
-})
+@swagger_auto_schema(method='get',
+                     manual_parameters=[
+                         openapi.Parameter('software_title',
+                                           type=openapi.TYPE_STRING,
+                                           description='software_title',
+                                           in_=openapi.IN_QUERY),
+                     ],
+                     responses={
+                         status.HTTP_200_OK: openapi.Schema(
+                             type=openapi.TYPE_OBJECT,
+                             properties={
+                                 'software': openapi.Schema(type=openapi.TYPE_ARRAY,
+                                                            items=openapi.Schema(type=openapi.TYPE_OBJECT)),
+                                 'install_software_request_id': openapi.Schema(type=openapi.TYPE_NUMBER),
+                                 'items_in_cart': openapi.Schema(type=openapi.TYPE_NUMBER),
+                             }
+                         ),
+                         status.HTTP_403_FORBIDDEN: "Forbidden",
+                     })
 @api_view(['GET'])
 @permission_classes([AllowAny])
 @authentication_classes([AuthBySessionIDIfExists])
@@ -327,7 +335,7 @@ def put_install_software_request(request, pk):
     if install_software_request is None:
         return Response("InstallSoftwareRequest not found", status=status.HTTP_404_NOT_FOUND)
 
-    if install_software_request.client != request.user:
+    if not request.user.is_staff and install_software_request.client != request.user:
         return Response(status=status.HTTP_403_FORBIDDEN)
 
     serializer = PutInstallSoftwareRequestSerializer(install_software_request,
@@ -359,7 +367,7 @@ def form_install_software_request(request, pk):
     if install_software_request is None:
         return Response("InstallSoftwareRequest not found", status=status.HTTP_404_NOT_FOUND)
 
-    if install_software_request.client != request.user:
+    if not request.user.is_staff and install_software_request.client != request.user:
         return Response(status=status.HTTP_403_FORBIDDEN)
 
     if install_software_request.host is None or install_software_request.host == "":
@@ -429,7 +437,7 @@ def delete_install_software_request(request, pk):
     if install_software_request is None:
         return Response("InstallSoftwareRequest not found", status=status.HTTP_404_NOT_FOUND)
 
-    if install_software_request.client != request.user:
+    if not request.user.is_staff and install_software_request.client != request.user:
         return Response(status=status.HTTP_403_FORBIDDEN)
 
     install_software_request.status = InstallSoftwareRequest.RequestStatus.DELETED
@@ -456,7 +464,7 @@ def put_software_in_request(request, request_pk, software_pk):
     install_software_request = InstallSoftwareRequest.objects.filter(id=request_pk).first()
     if install_software_request is None:
         return Response("InstallSoftwareRequest not found", status=status.HTTP_404_NOT_FOUND)
-    if install_software_request.client != request.user:
+    if not request.user.is_staff and install_software_request.client != request.user:
         return Response(status=status.HTTP_403_FORBIDDEN)
 
     software_in_request = SoftwareInRequest.objects.filter(request_id=request_pk, software_id=software_pk).first()
@@ -486,7 +494,7 @@ def delete_software_in_request(request, request_pk, software_pk):
     install_software_request = InstallSoftwareRequest.objects.filter(id=request_pk).first()
     if install_software_request is None:
         return Response("InstallSoftwareRequest not found", status=status.HTTP_404_NOT_FOUND)
-    if install_software_request.client != request.user:
+    if not request.user.is_staff and install_software_request.client != request.user:
         return Response(status=status.HTTP_403_FORBIDDEN)
 
     software_in_request = SoftwareInRequest.objects.filter(request_id=request_pk, software_id=software_pk).first()
