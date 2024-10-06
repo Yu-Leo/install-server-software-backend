@@ -47,8 +47,8 @@ urlpatterns = [
 
     # SoftwareInRequest
 
-    path('software_in_request/<int:pk>/put', views.put_software_in_request, name='software_in_request_put'),
-    path('software_in_request/<int:pk>/delete', views.delete_software_in_request, name='software_in_request_delete'),
+    path('software_in_request/<int:request_pk>/<int:software_pk>/put', views.put_software_in_request, name='software_in_request_put'),
+    path('software_in_request/<int:request_pk>/<int:software_pk>/delete', views.delete_software_in_request, name='software_in_request_delete'),
 
     # User
 

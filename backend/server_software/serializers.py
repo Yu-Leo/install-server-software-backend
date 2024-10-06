@@ -54,7 +54,7 @@ class ResolveInstallSoftwareRequestSerializer(serializers.ModelSerializer):
 class SoftwareInRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = SoftwareInRequest
-        fields = ["pk", "request", "software", "version"]
+        fields = ["request", "software", "version"]
 
 
 class SoftwareForRequestSerializer(serializers.ModelSerializer):
@@ -68,7 +68,7 @@ class RelatedSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SoftwareInRequest
-        fields = ["pk", "software", "version"]
+        fields = ["software", "version"]
 
 
 class FullInstallSoftwareRequestSerializer(serializers.ModelSerializer):

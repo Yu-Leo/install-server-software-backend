@@ -329,11 +329,11 @@ def delete_install_software_request(request, pk):
 
 
 @api_view(['PUT'])
-def put_software_in_request(request, pk):
+def put_software_in_request(request, request_pk, software_pk):
     """
     Изменение данных о ПО в заявке
     """
-    software_in_request = SoftwareInRequest.objects.filter(id=pk).first()
+    software_in_request = SoftwareInRequest.objects.filter(request_id=request_pk, software_id=software_pk).first()
     if software_in_request is None:
         return Response("SoftwareInRequest not found", status=status.HTTP_404_NOT_FOUND)
     serializer = SoftwareInRequestSerializer(software_in_request, data=request.data, partial=True)
@@ -345,11 +345,11 @@ def put_software_in_request(request, pk):
 
 
 @api_view(['DELETE'])
-def delete_software_in_request(request, pk):
+def delete_software_in_request(request, request_pk, software_pk):
     """
     Удаление ПО из заявки
     """
-    software_in_request = SoftwareInRequest.objects.filter(id=pk).first()
+    software_in_request = SoftwareInRequest.objects.filter(request_id=request_pk, software_id=software_pk).first()
     if software_in_request is None:
         return Response("SoftwareInRequest not found", status=status.HTTP_404_NOT_FOUND)
     software_in_request.delete()
