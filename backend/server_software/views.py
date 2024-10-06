@@ -73,6 +73,7 @@ def get_software_list(request):
                      responses={
                          status.HTTP_200_OK: SoftwareSerializer(),
                          status.HTTP_400_BAD_REQUEST: "Bad Request",
+                         status.HTTP_403_FORBIDDEN: "Forbidden",
                      })
 @api_view(['POST'])
 @permission_classes([IsManagerAuth])
@@ -98,6 +99,7 @@ def post_software(request):
                      responses={
                          status.HTTP_200_OK: "OK",
                          status.HTTP_400_BAD_REQUEST: "Bad Request",
+                         status.HTTP_403_FORBIDDEN: "Forbidden",
                      })
 @api_view(['POST'])
 @permission_classes([IsManagerAuth])
@@ -152,6 +154,7 @@ def get_software(request, pk):
 @swagger_auto_schema(method='delete',
                      responses={
                          status.HTTP_200_OK: "OK",
+                         status.HTTP_403_FORBIDDEN: "Forbidden",
                          status.HTTP_404_NOT_FOUND: "Not Found",
                      })
 @api_view(['DELETE'])
@@ -188,6 +191,7 @@ def delete_software(request, pk):
                      responses={
                          status.HTTP_200_OK: SoftwareSerializer(),
                          status.HTTP_400_BAD_REQUEST: "Bad Request",
+                         status.HTTP_403_FORBIDDEN: "Forbidden",
                          status.HTTP_404_NOT_FOUND: "Not Found",
                      })
 @api_view(['PUT'])
@@ -211,6 +215,7 @@ def put_software(request, pk):
 @swagger_auto_schema(method='post',
                      responses={
                          status.HTTP_200_OK: "OK",
+                         status.HTTP_403_FORBIDDEN: "Forbidden",
                          status.HTTP_404_NOT_FOUND: "Not Found",
                      })
 @api_view(['POST'])
@@ -336,13 +341,15 @@ def form_install_software_request(request, pk):
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-# TODO: права
 @swagger_auto_schema(method='put',
                      responses={
                          status.HTTP_200_OK: InstallSoftwareRequestSerializer(),
+                         status.HTTP_403_FORBIDDEN: "Forbidden",
                          status.HTTP_404_NOT_FOUND: "Not Found",
                      })
 @api_view(['PUT'])
+@permission_classes([IsManagerAuth])
+@authentication_classes([AuthBySessionID])
 def resolve_install_software_request(request, pk):
     """
     Закрытие заявки на установку ПО модератором
@@ -363,7 +370,7 @@ def resolve_install_software_request(request, pk):
     install_software_request = InstallSoftwareRequest.objects.get(id=pk)
     install_software_request.completion_datetime = datetime.now()
     install_software_request.total_installing_time_in_min = calculate_total_installing_time_for_req(pk)
-    install_software_request.SINGLETON_MANAGER = SINGLETON_MANAGER
+    install_software_request.manager = request.user
     install_software_request.save()
 
     serializer = InstallSoftwareRequestSerializer(install_software_request)
