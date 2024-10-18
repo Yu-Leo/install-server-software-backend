@@ -18,7 +18,10 @@ class ClientSerializer(serializers.ModelSerializer):
 
 
 class InstallSoftwareRequestSerializer(serializers.ModelSerializer):
-    client = ClientSerializer()
+    client = serializers.SerializerMethodField()
+
+    def get_client(self, obj):
+        return obj.client.username
 
     class Meta:
         model = InstallSoftwareRequest
