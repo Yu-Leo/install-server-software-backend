@@ -19,9 +19,13 @@ class ClientSerializer(serializers.ModelSerializer):
 
 class InstallSoftwareRequestSerializer(serializers.ModelSerializer):
     client = serializers.SerializerMethodField()
+    manager = serializers.SerializerMethodField()
 
     def get_client(self, obj):
         return obj.client.username
+
+    def get_manager(self, obj):
+        return obj.manager.username if obj.manager else None
 
     class Meta:
         model = InstallSoftwareRequest

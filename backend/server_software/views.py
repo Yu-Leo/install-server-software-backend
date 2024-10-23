@@ -272,7 +272,7 @@ def get_install_software_requests(request):
     formation_datetime_start_filter = request.query_params.get("formation_start")
     formation_datetime_end_filter = request.query_params.get("formation_end")
 
-    filters = ~Q(status=InstallSoftwareRequest.RequestStatus.DELETED)
+    filters = ~Q(status=InstallSoftwareRequest.RequestStatus.DELETED) & ~Q(status=InstallSoftwareRequest.RequestStatus.DRAFT)
     if status_filter is not None:
         filters &= Q(status=status_filter.upper())
     if formation_datetime_start_filter is not None:
