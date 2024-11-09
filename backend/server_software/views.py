@@ -1,5 +1,6 @@
 import os
 import uuid
+import time
 
 from datetime import datetime
 from dateutil.parser import parse
@@ -63,6 +64,7 @@ def get_software_list(request):
             "items_in_cart": items_in_cart,
         },
     )
+    time.sleep(0.25) # ДЛЯ ДЕМОНСТРАЦИИ АНИМАЦИИ ЗАГРУЗКИ НА ФРОНТЕ
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
