@@ -12,6 +12,7 @@ from rest_framework.permissions import AllowAny
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from rest_framework.parsers import FormParser
+from django.db import IntegrityError
 
 from settings import settings
 from .minio import MinioStorage
@@ -32,15 +33,7 @@ from .services import get_or_create_user_cart, is_valid_versions, \
                                            in_=openapi.IN_QUERY),
                      ],
                      responses={
-                         status.HTTP_200_OK: openapi.Schema(
-                             type=openapi.TYPE_OBJECT,
-                             properties={
-                                 'software': openapi.Schema(type=openapi.TYPE_ARRAY,
-                                                            items=openapi.Schema(type=openapi.TYPE_OBJECT)),
-                                 'install_software_request_id': openapi.Schema(type=openapi.TYPE_NUMBER),
-                                 'items_in_cart': openapi.Schema(type=openapi.TYPE_NUMBER),
-                             }
-                         ),
+                         status.HTTP_200_OK: GetSoftwareSerializer,
                          status.HTTP_403_FORBIDDEN: "Forbidden",
                      })
 @api_view(['GET'])
@@ -63,14 +56,14 @@ def get_software_list(request):
         if req is not None:
             items_in_cart = SoftwareInRequest.objects.filter(request_id=req.id).count()
 
-    serializer = SoftwareSerializer(software_list, many=True)
-    return Response(
+    serializer = GetSoftwareSerializer(
         {
-            "software": serializer.data,
+            "software": SoftwareSerializer(software_list, many=True).data,
             "install_software_request_id": req.id if req else None,
             "items_in_cart": items_in_cart,
         },
-        status=status.HTTP_200_OK)
+    )
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 @swagger_auto_schema(method='post',
@@ -220,6 +213,7 @@ def put_software(request, pk):
 @swagger_auto_schema(method='post',
                      responses={
                          status.HTTP_200_OK: "OK",
+                         status.HTTP_400_BAD_REQUEST: "Bad request",
                          status.HTTP_403_FORBIDDEN: "Forbidden",
                          status.HTTP_404_NOT_FOUND: "Not Found",
                      })
@@ -234,7 +228,10 @@ def post_software_to_request(request, pk):
     if software is None:
         return Response("Software not found", status=status.HTTP_404_NOT_FOUND)
     request_id = get_or_create_user_cart(request.user.id)
-    add_item_to_request(request_id, pk)
+    try:
+        add_item_to_request(request_id, pk)
+    except IntegrityError:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
     return Response(status=status.HTTP_200_OK)
 
 
@@ -258,7 +255,7 @@ def post_software_to_request(request, pk):
                                            format=openapi.FORMAT_DATETIME),
                      ],
                      responses={
-                         status.HTTP_200_OK: SoftwareSerializer(many=True),
+                         status.HTTP_200_OK: InstallSoftwareRequestSerializer(many=True),
                          status.HTTP_403_FORBIDDEN: "Forbidden",
                      })
 @api_view(['GET'])
@@ -272,7 +269,8 @@ def get_install_software_requests(request):
     formation_datetime_start_filter = request.query_params.get("formation_start")
     formation_datetime_end_filter = request.query_params.get("formation_end")
 
-    filters = ~Q(status=InstallSoftwareRequest.RequestStatus.DELETED) & ~Q(status=InstallSoftwareRequest.RequestStatus.DRAFT)
+    filters = ~Q(status=InstallSoftwareRequest.RequestStatus.DELETED) & ~Q(
+        status=InstallSoftwareRequest.RequestStatus.DRAFT)
     if status_filter is not None:
         filters &= Q(status=status_filter.upper())
     if formation_datetime_start_filter is not None:
@@ -283,7 +281,7 @@ def get_install_software_requests(request):
     if not request.user.is_staff:
         filters &= Q(client=request.user)
 
-    install_software_requests = InstallSoftwareRequest.objects.filter(filters).select_related("client")
+    install_software_requests = InstallSoftwareRequest.objects.filter(filters).select_related("client").order_by('-pk')
     serializer = InstallSoftwareRequestSerializer(install_software_requests, many=True)
 
     return Response(serializer.data, status=status.HTTP_200_OK)
@@ -446,7 +444,7 @@ def delete_install_software_request(request, pk):
 
 
 @swagger_auto_schema(method='put',
-                     request_body=SoftwareInRequestSerializer,
+                     request_body=UpdateSoftwareInRequestSerializer,
                      responses={
                          status.HTTP_200_OK: SoftwareInRequestSerializer(),
                          status.HTTP_400_BAD_REQUEST: "Bad Request",
@@ -527,7 +525,7 @@ def create_user(request):
 
 @swagger_auto_schema(method='post',
                      responses={
-                         status.HTTP_200_OK: "OK",
+                         status.HTTP_204_NO_CONTENT: "No content",
                          status.HTTP_400_BAD_REQUEST: "Bad Request",
                      },
                      manual_parameters=[
@@ -555,7 +553,7 @@ def login_user(request):
     if user is not None:
         session_id = str(uuid.uuid4())
         session_storage.set(session_id, username)
-        response = Response(status=status.HTTP_201_CREATED)
+        response = Response(status=status.HTTP_204_NO_CONTENT)
         response.set_cookie("session_id", session_id, samesite="lax")
         return response
     return Response({'error': 'Invalid Credentials'}, status=status.HTTP_400_BAD_REQUEST)
@@ -581,7 +579,7 @@ def logout_user(request):
 
 
 @swagger_auto_schema(method='put',
-                     request_body=UserSerializer,
+                     request_body=UserUpdateSerializer,
                      responses={
                          status.HTTP_200_OK: UserSerializer(),
                          status.HTTP_400_BAD_REQUEST: "Bad Request",

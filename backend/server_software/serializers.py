@@ -11,6 +11,12 @@ class SoftwareSerializer(serializers.ModelSerializer):
                   "is_active", "logo_file_path"]
 
 
+class GetSoftwareSerializer(serializers.Serializer):
+    software = SoftwareSerializer(many=True)
+    install_software_request_id = serializers.IntegerField(required=False, allow_null=True)
+    items_in_cart = serializers.IntegerField()
+
+
 class ClientSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -56,6 +62,12 @@ class ResolveInstallSoftwareRequestSerializer(serializers.ModelSerializer):
         read_only_fields = ["pk", "creation_datetime", "formation_datetime", "completion_datetime", "host", "client",
                             "manager",
                             "total_installing_time_in_min"]
+
+
+class UpdateSoftwareInRequestSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SoftwareInRequest
+        fields = ["version"]
 
 
 class SoftwareInRequestSerializer(serializers.ModelSerializer):
@@ -105,5 +117,27 @@ class UserSerializer(serializers.ModelSerializer):
         instance.email = validated_data.get('email', instance.email)
         if 'password' in validated_data:
             instance.set_password(validated_data['password'])
+        instance.save()
+        return instance
+
+
+class UserUpdateSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField(required=False, allow_blank=True)
+    password = serializers.CharField(write_only=True, required=False, allow_blank=True)
+
+    class Meta:
+        model = User
+        fields = ['email', 'password']
+        extra_kwargs = {
+            'password': {'write_only': True}
+        }
+
+    def update(self, instance, validated_data):
+        if 'email' in validated_data:
+            instance.email = validated_data['email']
+
+        if 'password' in validated_data:
+            instance.set_password(validated_data['password'])
+
         instance.save()
         return instance
