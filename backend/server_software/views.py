@@ -527,7 +527,7 @@ def create_user(request):
 
 @swagger_auto_schema(method='post',
                      responses={
-                         status.HTTP_204_NO_CONTENT: "No content",
+                         status.HTTP_200_OK: UserLoginSerializer(),
                          status.HTTP_400_BAD_REQUEST: "Bad Request",
                      },
                      manual_parameters=[
@@ -555,7 +555,8 @@ def login_user(request):
     if user is not None:
         session_id = str(uuid.uuid4())
         session_storage.set(session_id, username)
-        response = Response(status=status.HTTP_204_NO_CONTENT)
+        serializer = UserLoginSerializer(user)
+        response = Response(serializer.data, status=status.HTTP_200_OK)
         response.set_cookie("session_id", session_id, samesite="lax")
         return response
     return Response({'error': 'Invalid Credentials'}, status=status.HTTP_400_BAD_REQUEST)
