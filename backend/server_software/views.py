@@ -384,6 +384,7 @@ def form_install_software_request(request, pk):
 
 
 @swagger_auto_schema(method='put',
+                     request_body=ResolveInstallSoftwareRequestSerializer,
                      responses={
                          status.HTTP_200_OK: InstallSoftwareRequestSerializer(),
                          status.HTTP_403_FORBIDDEN: "Forbidden",
