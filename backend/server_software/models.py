@@ -10,7 +10,7 @@ class Software(models.Model):
     summary = models.TextField()
     description = models.TextField()
     is_active = models.BooleanField(default=True)
-    logo_file_path = models.CharField(max_length=255, null=False, default="")
+    logo_file_path = models.CharField(max_length=255, null=False, default="", blank=True)
 
     def __str__(self):
         return self.title
