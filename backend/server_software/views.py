@@ -91,11 +91,13 @@ def post_software(request):
 
 
 @swagger_auto_schema(method="post",
-                     manual_parameters=[
-                         openapi.Parameter(name="image",
-                                           in_=openapi.IN_QUERY,
-                                           type=openapi.TYPE_FILE,
-                                           required=True, description="Image")],
+                     request_body=openapi.Schema(
+                         type=openapi.TYPE_OBJECT,
+                         properties={
+                             'image': openapi.Schema(type=openapi.TYPE_FILE, description="Изображение для загрузки")
+                         },
+                         required=['image']
+                     ),
                      responses={
                          status.HTTP_200_OK: "OK",
                          status.HTTP_400_BAD_REQUEST: "Bad Request",
